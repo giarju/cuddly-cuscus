@@ -27,8 +27,8 @@ typedef struct Coordinate_t
 
 typedef struct Trajectory_t
 {
-   Coordinate Velocity;
-   Coordinate Distance;
+   Coordinate velocity;
+   Coordinate distance;
 }Trajectory;
 
 
