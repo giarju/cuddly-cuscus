@@ -1,0 +1,84 @@
+/***************************************************************************
+ * Title      : Program Debug Analog 
+ * Name       : debug_analog.cpp
+ * Version    : 1.0
+ * Author     : Gian Arjuna EL 16
+ * Date       : 12 Desember 2019
+ * Description:
+ *
+ * Program ini dapat digunakan untuk mengambil data analog dan sensor IR GP2A
+ * 
+ * Untuk menggunakan program ini UBAH DEKLARASI PIN PADA BAGIAN PIN LIST DIBAWAH 
+ * agar sesuai dengan pin yang sedang digunakan. Kemudian pilih mode debug yang ingin 
+ * dilakukan dengan comment/uncomment "#define" pada bagian mode debug
+ ***************************************************************************/
+#include "mbed.h"
+
+/* MODE DEBUG YANG DIINGINKAN */ 
+#define AMBIL_ANALOG
+#define AMBIL_GP2A
+
+AnalogIn analog1(PD_2);
+AnalogIn analog2(PD_2);
+AnalogIn analog3(PD_2);
+AnalogIn analog4(PD_2);
+
+
+/* timer untuk mendapatkan waktu */
+Timer timer1;
+
+/* komunikasi serial */
+Serial pc(USBTX, USBRX, 115200);
+
+
+/* variable analog */
+int an1, an2, an3, an4;
+
+/* variable gp2a */
+int i = 0;
+int last_ir = 0;
+double dist_ir1, dist_ir2, dist_ir3, dist_ir4;
+double vDist = 0;
+
+double getDistanceGP2A(AnalogIn IR, double slope, double max_volt);
+
+int main() {
+
+    #ifdef AMBIL_ANALOG
+        while(1)
+
+        {
+            an1 = analog1.read();
+            an2 = analog2.read();
+            an3 = analog3.read();
+            an4 = analog4.read();
+            pc.printf("%d %d %d %d\n",an1, an2, an3, an4);
+        }
+    #endif
+
+    #ifdef AMBIL_GP2A
+        while(1) {
+            timer1.start();
+            if (timer1.read_ms() - last_ir > 25){
+                dist_ir1 = getDistanceGP2A(analog1, 23.3, 3.3);
+                dist_ir2 = getDistanceGP2A(analog2, 23.3, 3.3);
+                dist_ir3 = getDistanceGP2A(analog3, 23.3, 3.3);
+                dist_ir4 = getDistanceGP2A(analog4, 23.3, 3.3);
+                pc.printf("%.2f %.2f %.2f %.2f\n",dist_ir1, dist_ir2, dist_ir3, dist_ir4);
+
+                last_ir = timer1.read_ms();
+            }
+        }
+    #endif
+}
+
+double getDistanceGP2A(AnalogIn IR, double slope, double max_volt)
+{
+    double vDist = (double)IR.read()*max_volt;
+    double distance_IR = slope/vDist;
+    
+    return (distance_IR);
+}
+
+
+

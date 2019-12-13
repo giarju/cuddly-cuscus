@@ -1,0 +1,108 @@
+/***************************************************************************
+ * Title      : Program Debug digital
+ * Name       : debug_digital.cpp
+ * Version    : 1.0
+ * Author     : Gian Arjuna EL 16
+ * Date       : 13 Desember 2019
+ * Description:
+ *
+ * Program ini dapat digunakan untuk mengambil data digital
+ * 
+ * Untuk menggunakan program ini UBAH DEKLARASI PIN PADA BAGIAN PIN LIST DIBAWAH 
+ * agar sesuai dengan pin yang sedang digunakan. Kemudian pilih mode debug yang ingin 
+ * dilakukan dengan COMMENT/UNCOMMENT "#define" pada bagian mode debug
+ *
+ ***************************************************************************/
+#include "mbed.h"
+
+/* MODE DEBUG YANG DIINGINKAN */ 
+#define AMBIL_DIGITAL
+
+/* Deklarasi pin */
+DigitalIn digital1(PA_1);
+DigitalIn digital2(PA_1);
+DigitalIn digital3(PA_1);
+DigitalIn digital4(PA_1);
+DigitalIn digital5(PA_1);
+DigitalIn digital6(PA_1);
+
+/* timer untuk mendapatkan waktu */
+Timer timer1;
+
+/* komunikasi serial */
+Serial pc(USBTX, USBRX, 115200);
+
+
+/* variable digital*/
+int dig1, dig2, dig3, dig4, dig5, dig6;
+
+
+int main() {
+
+    #ifdef AMBIL_DIGITAL
+        while(1)
+        {
+            if(digital1)
+            {
+                dig1 = 1;
+            }
+            else 
+            {
+                dig1 = 0;
+            }
+
+            if(digital2)
+            {
+                dig2 = 1;
+            }
+            else 
+            {
+                dig2 = 0;
+            }
+
+            if(digital3)
+            {
+                dig3 = 1;
+            }
+            else 
+            {
+                dig3 = 0;
+            }
+
+            if(digital4)
+            {
+                dig4 = 1;
+                
+            }
+            else 
+            {
+                dig4 = 0;
+            }
+
+            if(digital5)
+            {
+                dig5 = 1;
+            }
+            else 
+            {
+                dig5 = 0;
+            }
+
+            if(digital6)
+            {
+                dig6 = 1;
+            }
+            else 
+            {
+                dig6 = 0;
+            }
+
+            pc.printf("%d %d %d %d %d %d ", dig1, dig2, dig3, dig4, dig5, dig6);
+        }
+    #endif
+
+}
+
+
+
+
