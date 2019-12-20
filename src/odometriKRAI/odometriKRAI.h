@@ -4,8 +4,6 @@
 #include "mbed.h"
 #include "encoderHAL.h"
 #include "CMPS12_KRAI.h"
-#include "sensor.h"
-#include "constant.h"
 
 class odometriKRAI{
 
@@ -19,7 +17,6 @@ private:
     encoderHAL encX;
     encoderHAL encY;
     CMPS12_KRAI kompass;
-    Compass kompas;
 };
 
 

@@ -77,6 +77,7 @@ public:
     void compassResetOffsetValue();
     /**
      * Reset offset value from compass, set the initial condition from compass to be reference theta
+     * 
      */
 
     void compassUpdateValue();

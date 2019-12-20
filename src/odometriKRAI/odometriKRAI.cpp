@@ -16,6 +16,8 @@
 #include "odometriKRAI.h"
 #include "mbed.h"
 
+
+
 #ifndef PHI
 #define PHI  3.14159265359
 #endif
@@ -23,22 +25,23 @@
 #ifndef D_RODA
 #define D_RODA 0.06
 #endif
-
+/*************************** inisiasi class *******************************/
 odometriKRAI::odometriKRAI(TIM_TypeDef *_TIMEncX, TIM_TypeDef *_TIMEncY, PinName SDA, PinName SCL)
 : encX(_TIMEncX), encY(_TIMEncY), kompass(SDA, SCL, 0xC0) {
     x = 0;      // initiate all Value
     y = 0;      
     theta = 0;  
-    //kompas.compass_reset((float)kompass.getAngle()/10);
     kompass.compassResetOffsetValue();
-
     }
+
+
+/*************************** definisi fungsi ******************************/
+
 /* update position from base */
 void odometriKRAI::updatePosition(void){
     float xTemp = encX.getPulses(1);
     float yTemp = encY.getPulses(1);
 
-    //kompas.compass_update((float)kompass.getAngle()/10);
     kompass.compassUpdateValue();
     theta = kompass.compassValue();;
     x +=  (xTemp*PHI*D_RODA/4000)*cos(theta) + (yTemp*PHI*D_RODA/4000)*-sin(theta);
@@ -52,7 +55,6 @@ void odometriKRAI::resetOdom(void){
     y = 0;      
     theta = 0;
     
-    //kompas.compass_reset((float)kompass.getAngle()/10);
     kompass.compassResetOffsetValue();
 }
 
