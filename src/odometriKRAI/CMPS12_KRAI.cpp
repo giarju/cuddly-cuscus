@@ -15,6 +15,9 @@ CMPS12_KRAI::CMPS12_KRAI(PinName sda, PinName scl, int address) {
     //CMPS11 maksimum 100kHz CMPS12 maksimum 400kHz
     i2c->frequency(100000);
     i2cAddress = address;
+    _offset_compass_value = 0;
+    _theta_origin = 0;
+    _theta_offset = 0;
 
 }
 
@@ -125,4 +128,26 @@ int CMPS12_KRAI::getAccelX(void){
     int accelX = ((int)registerContents[11]<<8 | (int)registerContents[12] );
     
     return accelX;   
+}
+
+void CMPS12_KRAI::compassResetOffsetValue(){
+    _offset_compass_value = (float)CMPS12_KRAI::getAngle()/10;
+}
+
+void CMPS12_KRAI::compassUpdateValue(){
+    _theta_origin = (float)CMPS12_KRAI::getAngle()/10;
+    _theta_offset = _theta_origin - _offset_compass_value;
+}
+
+float CMPS12_KRAI::compassValue(){
+    float theta_transformed;
+
+    if(_theta_offset > 180.0f && _theta_offset <= 360.0f)
+        theta_transformed = (_theta_origin - 360.0f - _offset_compass_value)/-radian_to_degree;
+    else if(_theta_offset < -180.0f && _theta_offset >= -360.0f)
+        theta_transformed = (_theta_origin  + 360.0f - _offset_compass_value)/-radian_to_degree;
+    else
+        theta_transformed = (_theta_origin - _offset_compass_value)/-radian_to_degree;
+
+    return theta_transformed; 
 }

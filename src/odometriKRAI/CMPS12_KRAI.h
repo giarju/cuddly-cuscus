@@ -73,6 +73,27 @@ public:
     void stopCalibrate(void);
     
     int getAccelX(void);
+
+    void compassResetOffsetValue();
+    /**
+     * Reset offset value from compass, set the initial condition from compass to be reference theta
+     */
+
+    void compassUpdateValue();
+    /**
+     * Update value from compass using theta reference 
+     */
+
+    float compassValue();
+    /**
+     * Get the compass value, theta will be in degree from -180 to 180
+     */
+    
+private :
+    float _offset_compass_value;
+    float _theta_origin;
+    float _theta_offset;
+
 };
 
 #endif /* CMPS_KRAI_H */
