@@ -9,6 +9,7 @@
  * Includes
  */
 #include "CMPS12_KRAI.h"
+const float  radian_to_degree                       = 57.295779;
 
 CMPS12_KRAI::CMPS12_KRAI(PinName sda, PinName scl, int address) {
     i2c = new I2C(sda, scl);

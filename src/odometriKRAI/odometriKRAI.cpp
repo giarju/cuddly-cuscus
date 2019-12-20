@@ -1,4 +1,17 @@
+/***************************************************************************
+ * Title      : Library untuk odometri base
+ * Name       : odometriKrai.cpp
+ * Version    : 1.0
+ * Author     : Oktavianus Irvan Sitanggang EL 18
+ * Date       : 17 Desember 2019
+ * Description:
+ *
+ * Library ini digunakan untuk melakukan perhitungan posisi robot
+ * 
+ * 
+ ***************************************************************************/
 
+/******************************* library ***********************************/
 
 #include "odometriKRAI.h"
 #include "mbed.h"
