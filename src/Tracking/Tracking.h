@@ -26,7 +26,7 @@
 #define KI_X_BASE 0
 #define KD_X_BASE 0
 #define N_X_BASE 0
-#define TS_X_BASE 1
+#define TS_X_BASE 0.3173
 #define FF_X_BASE 1
 
 /*konstanta pid untuk vy*/
@@ -34,7 +34,7 @@
 #define KI_Y_BASE 0
 #define KD_Y_BASE 0
 #define N_Y_BASE 0
-#define TS_Y_BASE 1
+#define TS_Y_BASE 0.3173
 #define FF_Y_BASE 1
 
 /*konstanta pid untuk omega*/
@@ -42,7 +42,7 @@
 #define KI_TETA_BASE 0
 #define KD_TETA_BASE 0
 #define N_TETA_BASE 0
-#define TS_TETA_BASE 1
+#define TS_TETA_BASE 0.3173
 #define FF_TETA_BASE 1
 
 
