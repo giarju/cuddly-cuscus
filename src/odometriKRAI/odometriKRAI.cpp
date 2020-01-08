@@ -28,9 +28,9 @@
 /*************************** inisiasi class *******************************/
 odometriKRAI::odometriKRAI(TIM_TypeDef *_TIMEncX, TIM_TypeDef *_TIMEncY, PinName SDA, PinName SCL)
 : encX(_TIMEncX), encY(_TIMEncY), kompass(SDA, SCL, 0xC0) {
-    x = 0;      // initiate all Value
-    y = 0;      
-    theta = 0;  
+    position.x = 0;      // initiate all Value
+    position.y = 0;      
+    position.teta = 0;  
     kompass.compassResetOffsetValue();
     }
 
@@ -39,21 +39,21 @@ odometriKRAI::odometriKRAI(TIM_TypeDef *_TIMEncX, TIM_TypeDef *_TIMEncY, PinName
 
 /* update position from base */
 void odometriKRAI::updatePosition(void){
-    float xTemp = encX.getPulses(1);
-    float yTemp = encY.getPulses(1);
+    float xTemp = encX.getPulses(1);                            /* butuh 1.5us */
+    float yTemp = encY.getPulses(1);                            /* butuh 1.5us */
 
-    kompass.compassUpdateValue();
-    theta = kompass.compassValue();;
-    x +=  (xTemp*PHI*D_RODA/4000)*cos(theta) + (yTemp*PHI*D_RODA/4000)*-sin(theta);
-    y +=  (xTemp*PHI*D_RODA/4000)*sin(theta) + (yTemp*PHI*D_RODA/4000)*cos(theta);
+    kompass.compassUpdateValue();                               /* ??? */
+    position.teta = kompass.compassValue();;
+    position.x +=  (xTemp*PHI*D_RODA/4000)*cos(position.teta) + (yTemp*PHI*D_RODA/4000)*-sin(position.teta);        /* butuh 4.5 us */
+    position.y +=  (xTemp*PHI*D_RODA/4000)*sin(position.teta) + (yTemp*PHI*D_RODA/4000)*cos(position.teta);         /* butuh 4.5 us */
 
 }
 
 /* to reset all the position */
 void odometriKRAI::resetOdom(void){
-    x = 0;      // initiate all Value
-    y = 0;      
-    theta = 0;
+    position.x = 0;      // initiate all Value
+    position.y = 0;      
+    position.teta = 0;
     
     kompass.compassResetOffsetValue();
 }
