@@ -21,7 +21,7 @@ class PID{
             void setTunings(float p, float i, float d);
  
             float createpwm( float setpoint , float feedback ) ;
-            float createOutput( float setpoint , float feedback , float saturate, float feed)
+            float createOutput( float setpoint , float feedback , float saturate, float feed);
         
     private :
             float Kp ;
