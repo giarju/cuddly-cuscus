@@ -16,7 +16,6 @@ void getDataTF(I2C *tfmini, char addr, uint8_t *trigger_done, uint16_t *dist_HL,
     *mode = receive_buffer[6];
     
     /* to do 
-     * 1. interrupt based communication
      * 2. reset if for certain time data has not change
      * 3. ignore data if done is 0
      * 3.2 check for strength if data is valid or not
