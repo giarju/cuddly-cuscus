@@ -21,6 +21,7 @@ void doNothing(){
 void receiveData(int ID_DATA, int* var){                               //procedure receive data
     if (msg.id == ID_DATA){
         *var = *reinterpret_cast<int*>(msg.data);
+        wait(WAIT_CAN);
     }
 }
 
