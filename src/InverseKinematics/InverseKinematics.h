@@ -14,13 +14,15 @@
 #ifndef KINEMATICS_H
 #define KINEMATICS_H
 
+#include "mbed.h"
+#include "Path.h"
 
 
 /******************************* defines ***********************************/
-#define SQRT2 1.41421356237
+#define SQRT2 1.41421356237f
 
 /* radius base */
-#define R_BASE 1.0
+#define R_BASE 1.0f
 
 
 /************************* deklarasi fungsi  ***********************************/

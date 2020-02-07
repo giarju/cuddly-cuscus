@@ -3,14 +3,14 @@
 
 /*************************** Library  **********************************/
 #include "string.h"
-#include "platform/mbed_critical.h"
-#include "odometriKRAI/odometriKRAI.h"
 #include "Path/Path.h"
 #include "Tracking/Tracking.h"
 #include "InverseKinematics/InverseKinematics.h"
+#include "JoystickPS3/JoystickPS3.h"
 #include "PID/PID.h"
+#include "millis/millis.h"
 
-
+ 
 /*************************** Timer  **********************************/
 
 /* timer  dan ticker untuk mengukur waktu */
@@ -36,27 +36,29 @@ Ticker pid_motor_ticker;
  * diff1       : perbedaan awal dan akhir*/
 uint32_t prof_start1, prof_end1, diff1;
 
+uint32_t lastTimeTangan;
+
 
 /********************** Pergerakan Base ******************************/
 
 /* variable untuk menyimpan kecepatan motor base 
- * (volatile karena nilai dapat berubah kapan saja dalam ISR) */
+ *  */
 
 /* x_motor_speed : kecepatan aktual motor */
-volatile float a_motor_speed,b_motor_speed,c_motor_speed,d_motor_speed;
+float a_motor_speed,b_motor_speed,c_motor_speed,d_motor_speed;
 /* x_target_speed: kecepatan target motor */
-volatile float a_target_speed,b_target_speed,c_target_speed,d_target_speed;
+float a_target_speed,b_target_speed,c_target_speed,d_target_speed;
 /* X_pwm         : pwm yang diberikan ke motor*/
-volatile float A_pwm,B_pwm,C_pwm,D_pwm;
+float A_pwm,B_pwm,C_pwm,D_pwm;
 
 /* variable untuk menyimpan trajectory */
 
 /* i-th point dari map trajectory*/
-volatile int index_traject;
+int index_traject;
 /* Map trajectory, berisi nilai x,y,theta dan vx,vy,omega*/
 Trajectory map[100];
 /* kecapatan base, berisi nilai vx,vy,omega*/
-volatile Coordinate base_speed;
+Coordinate base_speed;
 
 
 /********************** PID Motor ******************************/
@@ -64,13 +66,13 @@ volatile Coordinate base_speed;
 /* Objek untuk melakukan PID motor */ 
 
 /* PID untuk motor A base (mode PI) */
-PID A_pid_motor(A_kp, A_ki, A_kd, A_N, A_TS, A_FF, PID::PI_MODE);
+PID A_pid_motor(A_kp, A_ki, A_kd, A_N, A_TS, A_FF, PID::Mode::PI_MODE);
 /* PID untuk motor B base (mode PI) */
-PID B_pid_motor(B_kp, B_ki, B_kd, B_N, B_TS, B_FF, PID::PI_MODE);
+PID B_pid_motor(B_kp, B_ki, B_kd, B_N, B_TS, B_FF, PID::Mode::PI_MODE);
 /* PID untuk motor C base (mode PI) */
-PID C_pid_motor(C_kp, C_ki, C_kd, C_N, C_TS, C_FF, PID::PI_MODE);
+PID C_pid_motor(C_kp, C_ki, C_kd, C_N, C_TS, C_FF, PID::Mode::PI_MODE);
 /* PID untuk motor D base (mode PI) */
-PID D_pid_motor(D_kp, D_ki, D_kd, D_N, D_TS, D_FF, PID::PI_MODE);
+PID D_pid_motor(D_kp, D_ki, D_kd, D_N, D_TS, D_FF, PID::Mode::PI_MODE);
 
 
 /********************** Komunikasi ******************************/
@@ -84,11 +86,15 @@ char uart_buffer[64];
  * maks ukuran string 64 karakter*/ 
 char str_buffer[64];
 /* pointer untuk menunjuk address uart_buffer*/ 
-volatile char* uart_pointer;
+char* uart_pointer;
 /* panjang string yang dikirimkan user*/ 
-volatile int8_t uart_buff_len;
+int8_t uart_buff_len;
 
 /* mutex untuk critical section UART*/
 PlatformMutex uart_mutex; 
+
+/********************** Pneumatic ******************************/
+bool state_kiri;
+
 
 #endif

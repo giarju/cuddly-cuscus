@@ -12,10 +12,6 @@
  ***************************************************************************/
 
 /******************************* library ***********************************/
-#include "mbed.h"
-#include "Path.h"
-#include "PID.h"
-#include "math.h"
 #include "Tracking.h"
 
 /*************************** definisi fungsi ******************************/
@@ -46,9 +42,9 @@ Coordinate velocityTracker(Trajectory next_pos, Coordinate  current_pos)
     Coordinate velocity;
 
     /* memberikan nilai target kecepatan dengan PIDF (FF target kecepatan dari map)*/
-    velocity.x = pid_x_base.createOutput(next_pos.distance.x, current_pos.x, BASE_SATURATE, next_pos.velocity.x);
-    velocity.y = pid_y_base.createOutput(next_pos.distance.y, current_pos.y, BASE_SATURETE, next_pos.velocity.y);
-    velocity.teta = pid_teta_base.createOutput(next_pos.distance.teta, current_pos.teta, BASE_SATURETE, next_pos.velocity.teta);
+    // velocity.x = pid_x_base.createOutput(next_pos.distance.x, current_pos.x, BASE_SATURATE, next_pos.velocity.x);
+    // velocity.y = pid_y_base.createOutput(next_pos.distance.y, current_pos.y, BASE_SATURATE, next_pos.velocity.y);
+    // velocity.teta = pid_teta_base.createOutput(next_pos.distance.teta, current_pos.teta, BASE_SATURATE, next_pos.velocity.teta);
 
     return(velocity);
 }

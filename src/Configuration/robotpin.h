@@ -8,16 +8,24 @@
 #include "encoderKRAI.h"
 #include "Motor.h"
 #include "Configuration/pinList.h" 
-
+#include "odometriKRAI/odometriKRAI.h"
+ 
 /*************************** Deklarasi PIN  **********************************/
 
 /************ Deklarasi Serial UART ************/
 
 /*komunikasi serial dengan PC */
 RawSerial pc(USBTX, USBRX, 115200);
+joysticknucleo stick(PIN_JOY_TX, PIN_JOY_RX);
 
 
 /************ Deklarasi objek I2C **************/
+
+
+/************ Deklarasi objek Pneumatic **************/
+DigitalOut armKiri(PIN_ARM_KIRI);
+DigitalOut armKanan(PIN_ARM_KANAN);
+DigitalOut tembak(PIN_TEMBAK);
 
 
 /************ Deklarasi objek odometri ************/
@@ -38,6 +46,10 @@ encoderKRAI B_enc(PIN_B_CHA, PIN_B_CHB, 538, encoderKRAI::X4_ENCODING);
 encoderKRAI C_enc(PIN_C_CHA, PIN_C_CHB, 538, encoderKRAI::X4_ENCODING);
 /* encoder untuk motor D base */ 
 encoderKRAI D_enc(PIN_D_CHA, PIN_D_CHB, 538, encoderKRAI::X4_ENCODING);
+/* encoder untuk motor kanan arm */ 
+encoderKRAI right_arm_enc(PIN_ARM_RIGHT_CHA, PIN_ARM_RIGHT_CHB, 538, encoderKRAI::X4_ENCODING);
+/* encoder untuk motor kanan arm */ 
+// encoderKRAI left_arm_enc(PIN_ARM_LEFT_CHA, PIN_ARM_LEFT_CHB, 538, encoderKRAI::X4_ENCODING);
 
    
 /************ Deklarasi objek motor ************/ 

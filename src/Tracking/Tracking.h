@@ -13,6 +13,11 @@
 #ifndef TRACKING_H
 #define TRACKING_H
 
+#include "mbed.h"
+#include "Path/Path.h"
+#include "PID/PID.h"
+#include "math.h"
+
 /******************************* defines ***********************************/
 
 /*lingkaran di titik, satuan dalam meter */
@@ -48,10 +53,11 @@
 
 /************************* deklarasi variable ***********************************/
 
+
 /* deklarasi pid untuk base */
-PID pid_x_base(KP_X_BASE, KI_X_BASE, KD_X_BASE, N_X_BASE, TS_X_BASE, FF_X_BASE, PID::PI_MODE);
-PID pid_y_base(KP_Y_BASE, KI_Y_BASE, KD_Y_BASE, N_Y_BASE, TS_Y_BASE, FF_Y_BASE, PID::PI_MODE);
-PID pid_teta_base(KP_TETA_BASE, KI_TETA_BASE, KD_TETA_BASE, N_TETA_BASE, TS_TETA_BASE, FF_TETA_BASE, PID::PI_MODE);
+// PID pid_x_base(KP_X_BASE, KI_X_BASE, KD_X_BASE, N_X_BASE, TS_X_BASE, FF_X_BASE, PID::Mode::PI_MODE);
+// PID pid_y_base(KP_Y_BASE, KI_Y_BASE, KD_Y_BASE, N_Y_BASE, TS_Y_BASE, FF_Y_BASE, PID::Mode::PI_MODE);
+// PID pid_teta_base(KP_TETA_BASE, KI_TETA_BASE, KD_TETA_BASE, N_TETA_BASE, TS_TETA_BASE, FF_TETA_BASE, PID::Mode::PI_MODE);
 
 
 /************************* deklarasi fungsi  ***********************************/
@@ -93,7 +99,7 @@ float computeAlpha(Coordinate next_pos, Coordinate current_pos);
  * @param decel : konstanta deselerasi robot
  * @param accel : kecepatan maksimum robot
  */
-float vwGenerator(Trajectory next, Trajectory current, Trajectory prev, float accel, float decel, float saturation)
+float vwGenerator(Trajectory next, Trajectory current, Trajectory prev, float accel, float decel, float saturation);
 
 
 #endif
