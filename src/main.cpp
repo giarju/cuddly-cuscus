@@ -197,15 +197,15 @@ int main() {
             if (timer1.read_us() - samp_pid > 9000)
             {
                 float setpoint = 1;
-                pwm1 = pid1.createpwm(setpoint,curr_speed);
-                pwm2 = pid2.createpwm(setpoint,curr_speed2);
-                pwm3 = pid3.createpwm(setpoint,curr_speed3);
-                pwm4 = pid4.createpwm(setpoint,curr_speed4);
+                // pwm1 = pid1.createpwm(setpoint,curr_speed);
+                // pwm2 = pid2.createpwm(setpoint,curr_speed2);
+                // pwm3 = pid3.createpwm(setpoint,curr_speed3);
+                // pwm4 = pid4.createpwm(setpoint,curr_speed4);
                 
-                motor1.speed(pwm1);                
-                motor2.speed(pwm2);
-                motor3.speed(pwm3);
-                motor4.speed(pwm4);
+                motor1.speed(0.5);                
+                motor2.speed(0.5);
+                motor3.speed(0.5);
+                motor4.speed(0.5);
 
             }   
             
