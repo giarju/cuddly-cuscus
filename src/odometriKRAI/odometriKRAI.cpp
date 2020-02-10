@@ -43,7 +43,7 @@ void odometriKRAI::updatePosition(void){
     float yTemp = encY.getPulses(1);                            /* butuh 1.5us */
 
     kompass.compassUpdateValue();                               /* ??? */
-    position.teta = kompass.compassValue();;
+    position.teta = kompass.compassValue();
     position.x +=  (xTemp*PHI*D_RODA/4000)*cos(position.teta) + (yTemp*PHI*D_RODA/4000)*-sin(position.teta);        /* butuh 4.5 us */
     position.y +=  (xTemp*PHI*D_RODA/4000)*sin(position.teta) + (yTemp*PHI*D_RODA/4000)*cos(position.teta);         /* butuh 4.5 us */
 
