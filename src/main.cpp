@@ -30,23 +30,25 @@
  
 /***** PIN LIST *****/
 /* pin assignment untuk encoder */
-encoderKRAI enc(PC_10 , PC_11 ,  538, encoderKRAI::X4_ENCODING);
-encoderKRAI enc2(PC_13 , PC_12 ,  538, encoderKRAI::X4_ENCODING);
-encoderKRAI enc3(PC_14 , PC_3 ,  538, encoderKRAI::X4_ENCODING);
-encoderKRAI enc4(PC_15 , PC_2 ,  538, encoderKRAI::X4_ENCODING);
+encoderKRAI enc(PC_12 , PC_11 ,  538, encoderKRAI::X4_ENCODING);
+encoderKRAI enc2(PC_2 , PC_3 ,  538, encoderKRAI::X4_ENCODING);
+encoderKRAI enc4(PC_14, PC_15 ,  538, encoderKRAI::X4_ENCODING);
+encoderKRAI enc3(PC_13 , PC_10 ,  538, encoderKRAI::X4_ENCODING);
 
 /* pin assignment untuk motor */
-Motor motor1(PA_6, PA_5, PA_7); 
-Motor motor2(PB_2, PB_15,PB_1); 
-Motor motor3(PB_2, PB_15,PB_1); 
-Motor motor4(PB_2, PB_15,PB_1);
+Motor motor1(PA_7, PA_5, PA_6); 
+Motor motor2(PB_0, PC_0,PC_1); 
+Motor motor3(PB_1, PB_14,PB_15); 
+Motor motor4(PB_10, PB_3,PA_10);
 
-float kp1,kp2,kp3,kp4;
+float kp1 = 0.68622,kp2 = 0.68622,kp3 = 0.68622,kp4 = 0.68622;
 float kd1 = 0,kd2 = 0,kd3 = 0,kd4 = 0;
-float ki1 = 0,ki2 = 0,ki3 = 0,ki4 = 0;
+float ki1 = 2.8712 ,ki2 = 2.8712,ki3 = 2.8712,ki4 = 2.8712;
 float ff1 = 0,ff2 = 0,ff3 = 0,ff4 = 0;
 float n1 = 0,n2 = 0,n3 = 0,n4 = 0;
 float ts1 = 0.007;
+float PI = 3.14159;
+float wheel_radius = 0.075;
 
 PID pid1(kp1, ki1, kd1, n1, ts1, ff1, PID::PI_MODE);
 PID pid2(kp2, ki2, kd2, n2, ts1, ff2, PID::PI_MODE);
@@ -69,6 +71,8 @@ float speed[400];
 float speed2[400];
 float speed3[400];
 float speed4[400];
+float input[400];
+float time_array[400];
 
 /* variable kecepatan dan posisi*/
 float curr_speed, prev_speed;
@@ -167,10 +171,12 @@ int main() {
     #ifdef TES_PID
         /* setup and initialization*/
         timer1.start();
-        motor1.period(0.00004);
-        motor2.period(0.00004);
-        motor3.period(0.00004);
-        motor4.period(0.00004);
+        float period = 0.0005;
+        motor1.period(period);
+        motor2.period(period);
+        motor3.period(period);
+        motor4.period(period);
+        float pwmz = 0.7;
     
         /* command move motor and sample data*/ 
         while(counttt <= 400)
@@ -178,10 +184,12 @@ int main() {
             if (timer1.read_us()-samp >= 7000)
             {
                 TS = timer1.read_us()-samp;
-                curr_speed = (float)enc.getPulses()*360/538/TS*1000000;
-                curr_speed2 = (float)enc2.getPulses()*360/538/TS*1000000;
-                curr_speed3 = (float)enc3.getPulses()*360/538/TS*1000000;
-                curr_speed4 = (float)enc4.getPulses()*360/538/TS*1000000;
+                time_array[counttt] = (float)timer1.read_us()/1000000;
+                input[counttt] = pwmz*24;
+                curr_speed = (float)enc.getPulses()*2*PI*wheel_radius/538/TS*1000000;
+                curr_speed2 = (float)enc2.getPulses()*2*PI*wheel_radius/538/TS*1000000;
+                curr_speed3 = (float)enc3.getPulses()*2*PI*wheel_radius/538/TS*1000000;
+                curr_speed4 = (float)enc4.getPulses()*2*PI*wheel_radius/538/TS*1000000;
                 speed[counttt] = curr_speed;
                 speed2[counttt] = curr_speed2;
                 speed3[counttt] = curr_speed3;
@@ -196,17 +204,19 @@ int main() {
             } 
             if (timer1.read_us() - samp_pid > 9000)
             {
-                float setpoint = 1;
-                // pwm1 = pid1.createpwm(setpoint,curr_speed);
-                // pwm2 = pid2.createpwm(setpoint,curr_speed2);
-                // pwm3 = pid3.createpwm(setpoint,curr_speed3);
-                // pwm4 = pid4.createpwm(setpoint,curr_speed4);
+                float setpoint = 2;
+                pwm1 = pid1.createpwm(setpoint,curr_speed);
+                pwm2 = pid2.createpwm(setpoint,curr_speed2);
+                pwm3 = pid3.createpwm(setpoint,curr_speed3);
+                pwm4 = pid4.createpwm(setpoint,curr_speed4);
                 
-                motor1.speed(0.5);                
-                motor2.speed(0.5);
-                motor3.speed(0.5);
-                motor4.speed(0.5);
+               
+                motor1.speed(pwm1);                
+                motor2.speed(pwm2);
+                motor3.speed(pwm3);
+                motor4.speed(pwm4);
 
+                samp_pid = timer1.read_us(); 
             }   
             
         }
@@ -221,7 +231,7 @@ int main() {
         /* print data */
         for(i = 0; i < 400; i++)
         {
-            pc.printf("%f   %f  %f  %f\n", speed[i], speed2[i], speed3[i], speed4[i]);          
+            pc.printf("%f  %f  %f  %f   %f  %f\n", speed[i], speed2[i], speed3[i], speed4[i], time_array[i], input[i]);          
         } 
     #endif
     /* ================================================================== */
