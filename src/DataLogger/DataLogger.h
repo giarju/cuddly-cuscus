@@ -37,11 +37,11 @@
  * DATA LOGGER KRAI Interface *
  ******************************/
  
-class dataloggerKRAI {
+// class dataloggerKRAI {
     
-public:
-    void printLog (int x, y, v, teta);
+// public:
+//     void printLog (int x, y, v, teta);
     
-};
+// };
 
 #endif /*DATALOGGER_H*/
