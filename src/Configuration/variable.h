@@ -66,13 +66,13 @@ Coordinate base_speed;
 /* Objek untuk melakukan PID motor */ 
 
 /* PID untuk motor A base (mode PI) */
-PID A_pid_motor(A_kp, A_ki, A_kd, A_N, A_TS, A_FF, PID::Mode::PI_MODE);
+PID A_pid_motor(A_kp, A_ki, A_kd, A_N, A_TS, A_FF, PID::PI_MODE);
 /* PID untuk motor B base (mode PI) */
-PID B_pid_motor(B_kp, B_ki, B_kd, B_N, B_TS, B_FF, PID::Mode::PI_MODE);
+PID B_pid_motor(B_kp, B_ki, B_kd, B_N, B_TS, B_FF, PID::PI_MODE);
 /* PID untuk motor C base (mode PI) */
-PID C_pid_motor(C_kp, C_ki, C_kd, C_N, C_TS, C_FF, PID::Mode::PI_MODE);
+PID C_pid_motor(C_kp, C_ki, C_kd, C_N, C_TS, C_FF, PID::PI_MODE);
 /* PID untuk motor D base (mode PI) */
-PID D_pid_motor(D_kp, D_ki, D_kd, D_N, D_TS, D_FF, PID::Mode::PI_MODE);
+PID D_pid_motor(D_kp, D_ki, D_kd, D_N, D_TS, D_FF, PID::PI_MODE);
 
 
 /********************** Komunikasi ******************************/

@@ -3,12 +3,12 @@
  *  untuk memasukkan data ke dalam SD card
  **/
  
-#ifndef DATALOGGER_H
-#define DATALOGGER_H
+// #ifndef DATALOGGER_H
+// #define DATALOGGER_H
 
-//Library
-#include "mbed.h"
-#include "SDFileSystem.h"
+// //Library
+// #include "mbed.h"
+// #include "SDFileSystem.h"
 
 /* Penggunaan Library 
 
@@ -44,4 +44,4 @@
     
 // };
 
-#endif /*DATALOGGER_H*/
+// #endif /*DATALOGGER_H*/

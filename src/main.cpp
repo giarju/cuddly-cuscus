@@ -129,7 +129,7 @@ int main ()
             // prof_start1 = profiler.read_us();
             // prof_end1 = profiler.read_us();
             // diff1 = prof_end1 - prof_start1;
-            // pc.printf("%lu\n", diff1);       
+            // pc.printf("");       
     } 
 }
 
@@ -182,6 +182,7 @@ void motorSamp()
         C_motor.forcebrake(); 
         D_motor.forcebrake();
     }
+    else{
         A_motor.speed(A_pwm);
         B_motor.speed(B_pwm);
         C_motor.speed(C_pwm); 
