@@ -15,7 +15,8 @@
 /************ Deklarasi Serial UART ************/
 
 /*komunikasi serial dengan PC */
-RawSerial pc(USBTX, USBRX, 115200);
+// RawSerial pc(USBTX, USBRX, 115200);
+Serial pc(USBTX, USBRX, 115200);
 joysticknucleo stick(PIN_JOY_TX, PIN_JOY_RX);
 
 

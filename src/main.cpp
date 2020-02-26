@@ -18,11 +18,13 @@
 /******************** Aktivasi Debug ************************/
 
 // #define ODOMETRY_DEBUG 
-#define SERIAL_DEBUG 
+// #define SERIAL_DEBUG 
 #define MOTOR_DEBUG
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
-// #define JOYSTICK_DEBUG
+#define JOYSTICK_DEBUG
+
+
 
 int counttt = 0;
 float a_target_speed_prev, a_target_speed_prev2;
@@ -133,9 +135,19 @@ int main ()
         serial_ticker.attach_us(&pcSerialSamp, SERIAL_SAMP);
     #endif 
 
+    // #ifdef JOYSTICK_DEBUG
+    //     /* sampling komunikasi serial */
+    //     stick_ticker.attach_us(&stickState, STICK_SAMP);
+    // #endif 
+
     while (1)
     {   
-        wait(10.0);   
+        // wait(10.0);   
+        if (stick.readable()){
+            stick.baca_data();
+            stick.olah_data();
+        }
+        stickState();
             // prof_start1 = profiler.read_us();
             // prof_end1 = profiler.read_us();
             // diff1 = prof_end1 - prof_start1;
@@ -308,7 +320,7 @@ void writeUart() /* butuh 4 us */
     CriticalSectionLock::disable();
 }
 #endif
-
+    
 float trapeziumProfile(float amax, float TS, float prev_speed, uint32_t time){
     if (time < 500000){
         return prev_speed + amax*TS;
@@ -330,9 +342,15 @@ void stickState(){
     /* RESET STATE */ 
     if (stick.START){        
         pc.printf("start \n");
+        count_print = 0;
     } 
     else if (stick.SELECT){
         //pc.printf("select \n");
+        while(count_select < 400){
+            pc.printf("%f %f %f %f %f %d\n", speed_array_a[count_select],speed_array_b[count_select],
+            speed_array_c[count_select],speed_array_d[count_select],time_array[count_select], count_select);
+            count_select++;
+        }
     }
 
     /* STICK ROTATION STATE */ 
@@ -343,7 +361,7 @@ void stickState(){
         base_speed.teta = -PI/2;
     }
 
-    
+    statePrint = 1;
     /* STICK ARROW STATE */
     if ((!stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(!stick.kiri)
             &&(!stick.R2)&&(!stick.R1)&&(!stick.L1)){
@@ -351,7 +369,7 @@ void stickState(){
         base_speed.x = 0;
         base_speed.y = 0;
         base_speed.teta = 0;
-        
+        statePrint = 0;
         //pc.printf("diam\n");
     } 
     else if ((stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
@@ -359,6 +377,7 @@ void stickState(){
         base_speed.x = 0;
         base_speed.y = 2;
         base_speed.teta = 0;
+
         //pc.printf("atas\n");
     } 
     else if ((!stick.atas)&&(stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
@@ -479,8 +498,20 @@ void stickState(){
     }
     else if(!stick.silang && !stick.lingkaran && !stick.kotak && stick.segitiga){
         tembak = 0;
+        count_select = 0;
     }
-    
+
+    if(stick.R1){
+        if(count_print < 400 && statePrint == 1 && millis() - time_s > 3){
+            speed_array_a[count_print] = a_motor_speed;
+            speed_array_b[count_print] = b_motor_speed;
+            speed_array_c[count_print] = c_motor_speed;
+            speed_array_d[count_print] = d_motor_speed;
+            time_array[count_print] = millis();
+            count_print++;
+            time_s = millis();
+        }
+    }
     //Ganti lapangan
     if(stick.L3){
         state_kiri=1;

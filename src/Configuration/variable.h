@@ -30,6 +30,8 @@ Ticker tracking_ticker;
 /* interupsi sampling pid motor base*/
 Ticker pid_motor_ticker;
 
+Ticker stick_ticker;
+
 /* variable untuk menyimpan waktu 
  * prof_start1 : menyimpan waktu awal 
  * prof_end1   : menyimpan waktu akhir
@@ -97,5 +99,14 @@ PlatformMutex uart_mutex;
 /********************** Pneumatic ******************************/
 bool state_kiri;
 
+int count_print = 0;
+        int count_select = 0;
+float speed_array_a[400];
+float speed_array_b[400];
+float speed_array_c[400];
+float speed_array_d[400];
+float time_array[400];
+uint32_t time_s = 0;
 
+int statePrint;
 #endif
