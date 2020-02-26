@@ -26,7 +26,7 @@ Motor::Motor(PinName pwm, PinName fwd, PinName rev):
         _pwm(pwm), _fwd(fwd), _rev(rev) {
 
     // Set initial condition of PWM
-    _pwm.period(0.00005);
+    _pwm.period(0.0005);
     _pwm = 0;
 
     // Initial condition of output enables

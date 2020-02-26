@@ -27,24 +27,24 @@
 /* Encoder Motor Base */
 
 /* Encoder A */
-#define PIN_A_CHA       PC_12
+#define PIN_A_CHA       PC_11
 /* Encoder A */
-#define PIN_A_CHB       PC_11
+#define PIN_A_CHB       PC_12
 
 /* Encoder B */
-#define PIN_B_CHA       PC_2
+#define PIN_B_CHA       PC_3
 /* Encoder B */
-#define PIN_B_CHB       PC_3
+#define PIN_B_CHB       PC_2
 
 /* Encoder C */
-#define PIN_C_CHA       PC_15
+#define PIN_C_CHA       PC_14
 /* Encoder C */
-#define PIN_C_CHB       PC_14
+#define PIN_C_CHB       PC_15
 
 /* Encoder D */
-#define PIN_D_CHA       PC_10
+#define PIN_D_CHA       PC_13
 /* Encoder D */
-#define PIN_D_CHB       PC_13
+#define PIN_D_CHB       PC_10
 
 /* Encoder arm kanan */
 #define PIN_ARM_RIGHT_CHA       PB_7
@@ -62,16 +62,16 @@
 /* Motor A */
 #define PIN_PWM_A       PA_7
 /* Motor A */
-#define PIN_FWD_A       PA_5
+#define PIN_FWD_A       PA_6
 /* Motor A */
-#define PIN_REV_A       PA_6
+#define PIN_REV_A       PA_5
 
 /* Motor B */
 #define PIN_PWM_B       PB_0
 /* Motor B */
-#define PIN_FWD_B       PC_0
+#define PIN_FWD_B       PC_1
 /* Motor B */
-#define PIN_REV_B       PC_1
+#define PIN_REV_B       PC_0
 
 /* Motor C */
 #define PIN_PWM_C       PB_1
@@ -83,9 +83,9 @@
 /* Motor D */
 #define PIN_PWM_D       PB_10
 /* Motor D */
-#define PIN_FWD_D       PB_3
+#define PIN_FWD_D       PA_10
 /* Motor D */
-#define PIN_REV_D       PA_10
+#define PIN_REV_D       PB_3
 
 /* Motor D */
 #define PIN_PWM_ARM_RIGHT       PA_15

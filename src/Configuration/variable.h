@@ -45,11 +45,12 @@ uint32_t lastTimeTangan;
  *  */
 
 /* x_motor_speed : kecepatan aktual motor */
-float a_motor_speed,b_motor_speed,c_motor_speed,d_motor_speed;
+float a_motor_speed,b_motor_speed,c_motor_speed,d_motor_speed,right_arm_speed,left_arm_speed;
 /* x_target_speed: kecepatan target motor */
 float a_target_speed,b_target_speed,c_target_speed,d_target_speed;
 /* X_pwm         : pwm yang diberikan ke motor*/
 float A_pwm,B_pwm,C_pwm,D_pwm;
+float A_pwm_dzcompensated,B_pwm_dzcompensated,C_pwm_dzcompensated,D_pwm_dzcompensated;
 
 /* variable untuk menyimpan trajectory */
 
@@ -66,13 +67,13 @@ Coordinate base_speed;
 /* Objek untuk melakukan PID motor */ 
 
 /* PID untuk motor A base (mode PI) */
-PID A_pid_motor(A_kp, A_ki, A_kd, A_N, A_TS, A_FF, PID::PI_MODE);
+PID A_pid_motor(A_kp, A_ki, A_kd, A_N, A_TS, A_ka, A_kb, PID::PI_MODE);
 /* PID untuk motor B base (mode PI) */
-PID B_pid_motor(B_kp, B_ki, B_kd, B_N, B_TS, B_FF, PID::PI_MODE);
+PID B_pid_motor(B_kp, B_ki, B_kd, B_N, B_TS, B_ka, B_kb, PID::PI_MODE);
 /* PID untuk motor C base (mode PI) */
-PID C_pid_motor(C_kp, C_ki, C_kd, C_N, C_TS, C_FF, PID::PI_MODE);
+PID C_pid_motor(C_kp, C_ki, C_kd, C_N, C_TS, C_ka, C_kb, PID::PI_MODE);
 /* PID untuk motor D base (mode PI) */
-PID D_pid_motor(D_kp, D_ki, D_kd, D_N, D_TS, D_FF, PID::PI_MODE);
+PID D_pid_motor(D_kp, D_ki, D_kd, D_N, D_TS, D_ka, D_kb, PID::PI_MODE);
 
 
 /********************** Komunikasi ******************************/

@@ -33,7 +33,7 @@ DigitalOut tembak(PIN_TEMBAK);
 /* Odometry            : melakukan perhitungan odometry
  * TIM2 & TIM3         : Register timer untuk encoder eksternal
  * CMPS_SDA & CMPS_SCL : PIN I2C untuk compass */
-odometriKRAI Odometry(TIM2, TIM3, CMPS_SDA, CMPS_SCL); 
+// odometriKRAI Odometry(TIM2, TIM3, CMPS_SDA, CMPS_SCL); 
 
 
 /************ Deklarasi objek encoder ************/
@@ -49,7 +49,7 @@ encoderKRAI D_enc(PIN_D_CHA, PIN_D_CHB, 538, encoderKRAI::X4_ENCODING);
 /* encoder untuk motor kanan arm */ 
 encoderKRAI right_arm_enc(PIN_ARM_RIGHT_CHA, PIN_ARM_RIGHT_CHB, 538, encoderKRAI::X4_ENCODING);
 /* encoder untuk motor kanan arm */ 
-// encoderKRAI left_arm_enc(PIN_ARM_LEFT_CHA, PIN_ARM_LEFT_CHB, 538, encoderKRAI::X4_ENCODING);
+//encoderKRAI left_arm_enc(PIN_ARM_LEFT_CHA, PIN_ARM_LEFT_CHB, 538, encoderKRAI::X4_ENCODING);
 
    
 /************ Deklarasi objek motor ************/ 

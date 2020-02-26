@@ -16,12 +16,11 @@ class PID{
                 PID_MODE
             }Mode;
  
-            PID(float p , float i , float d , float _N , float _Ts, float FF, Mode _mode) ;
+            PID(float p , float i , float d , float _N , float _Ts, float ka, float kb, Mode _mode);
  
-            void setTunings(float p, float i, float d);
+            void setTunings(float p, float i, float d, float ka, float kb);
  
-            float createpwm( float setpoint , float feedback ) ;
-            float createOutput( float setpoint , float feedback , float saturate, float feed);
+            float createpwm( float setpoint , float feedback, float saturate) ;
         
     private :
             float Kp ;
@@ -47,6 +46,8 @@ class PID{
             float u1;
             float u0; 
             float FF;
+            float FFs;
+            float prev_setpoint;
             Mode mode;
 };
 #endif

@@ -17,13 +17,16 @@
 
 /******************** Aktivasi Debug ************************/
 
-#define ODOMETRY_DEBUG 
+// #define ODOMETRY_DEBUG 
 #define SERIAL_DEBUG 
 #define MOTOR_DEBUG
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
-#define JOYSTICK_DEBUG
+// #define JOYSTICK_DEBUG
 
+int counttt = 0;
+float a_target_speed_prev, a_target_speed_prev2;
+float a_target_accel, a_target_jerk;
 /**************** function declaration ***********************/
 
 
@@ -81,16 +84,23 @@ void writeUart();
  * */
 void stickState();
 
+/* 
+ * prosedur untuk kontrol joystick
+ * 
+ * */
+float trapeziumProfile(float amax, float TS, float prev_speed, uint32_t time);
+
 
 /******************* Main Function **************************/
 int main ()
 {
     /* initial setup */
-    Odometry.resetOdom();   
+    // Odometry.resetOdom();   
     profiler.start(); 
     startMillis();
     stick.setup();
     stick.idle();
+
 
     /* inisialisasi sampling untuk setiap proses dengan callback*/
     #ifdef ODOMETRY_DEBUG
@@ -154,10 +164,12 @@ void odometrySamp ()  /*butuh 48018 us */
 void encoderMotorSamp()  /* butuh 8 us */
 {
     /* ukur kecepatan motor base dalam m/s */
-    a_motor_speed = (float)A_enc.getPulses()*2*PI/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
-    b_motor_speed = (float)B_enc.getPulses()*2*PI/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
-    c_motor_speed = (float)C_enc.getPulses()*2*PI/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
-    d_motor_speed = (float)D_enc.getPulses()*2*PI/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    a_motor_speed = (float)A_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    b_motor_speed = (float)B_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    c_motor_speed = (float)C_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    d_motor_speed = (float)D_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    right_arm_speed = (float)right_arm_enc.getPulses()*360*180/(124.46*ENC_MOTOR_PULSE);
+    //left_arm_speed = (float)left_arm_enc.getPulses()*2*PI/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
     
     /* reset nilai encoder */
     A_enc.reset();
@@ -175,6 +187,10 @@ void encoderMotorSamp()  /* butuh 8 us */
 void motorSamp()
 {
     /* menggerakan motor base */
+    base_speed.x = 1;
+    base_speed.y = 1;
+    base_speed.teta = 1;
+
     if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
     {
         A_motor.forcebrake();
@@ -182,7 +198,7 @@ void motorSamp()
         C_motor.forcebrake(); 
         D_motor.forcebrake();
     }
-    else{
+    else{      
         A_motor.speed(A_pwm);
         B_motor.speed(B_pwm);
         C_motor.speed(C_pwm); 
@@ -198,11 +214,24 @@ void motorSamp()
 #ifdef PID_MOTOR_DEBUG
 void pidMotorSamp()
 {
+
+    a_target_speed = trapeziumProfile(-4, 0.004713, a_target_speed, profiler.read_us());
+    b_target_speed = trapeziumProfile(4, 0.004713, b_target_speed, profiler.read_us());
+    c_target_speed = trapeziumProfile(4, 0.004713, c_target_speed, profiler.read_us());
+    d_target_speed = trapeziumProfile(-4, 0.004713, d_target_speed, profiler.read_us());
+
+    a_target_accel = a_target_speed - a_target_speed_prev;
+    a_target_jerk = a_target_speed - 2*a_target_speed_prev + a_target_speed_prev2;
+
     /* menghitung pid motor base */
-    A_pwm = A_pid_motor.createpwm(a_target_speed, a_motor_speed);
-    B_pwm = B_pid_motor.createpwm(b_target_speed, b_motor_speed);
-    C_pwm = C_pid_motor.createpwm(c_target_speed, c_motor_speed);
-    D_pwm = D_pid_motor.createpwm(d_target_speed, d_motor_speed);
+    A_pwm = A_pid_motor.createpwm(a_target_speed, a_motor_speed, 1);
+    B_pwm = B_pid_motor.createpwm(b_target_speed, b_motor_speed, 1);
+    C_pwm = C_pid_motor.createpwm(c_target_speed, c_motor_speed, 1);
+    D_pwm = D_pid_motor.createpwm(d_target_speed, d_motor_speed, 1);
+
+    a_target_speed_prev2 = a_target_speed_prev;
+    a_target_speed_prev = a_target_speed;
+    
 }
 #endif
  
@@ -227,8 +256,9 @@ void trackingSamp()
  * */
 void pcSerialSamp() /*1200 us untuk 16 karakter pc.printf*/ /* 20 us dgn attach*/
 {
-    /* write string ke buffer 1 (str_buffer)*/     
-    sprintf(str_buffer, "bbbbbbbbbbbbbbbbbb\n");
+    /* write string ke buffer 1 (str_buffer) */     
+    // sprintf(str_buffer, "%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f\n", a_motor_speed,b_motor_speed,c_motor_speed,d_motor_speed,A_pwm,B_pwm,C_pwm,D_pwm);
+    sprintf(str_buffer, "%.2f %.2f %.2f %.2f\n",  d_target_speed, d_motor_speed, D_pwm, b_motor_speed);
     /* mengirimkan string melalui uart */
     sendUart(str_buffer);      
 }
@@ -278,6 +308,21 @@ void writeUart() /* butuh 4 us */
     CriticalSectionLock::disable();
 }
 #endif
+
+float trapeziumProfile(float amax, float TS, float prev_speed, uint32_t time){
+    if (time < 500000){
+        return prev_speed + amax*TS;
+    }
+    else if ((500000 <= time) && (time < 4000000)){
+        return prev_speed;
+    }
+    else if ((4000000 <= time) && (time < 4500000)){
+        return prev_speed - amax*TS;
+    }
+    else {
+        return 0;
+    }
+}
 
 /* state joystick */
 void stickState(){
