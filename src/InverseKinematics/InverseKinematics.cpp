@@ -22,9 +22,9 @@
 /* melakukan perhitungan inverse kinematics untuk base omniwheel 4 roda 45 derajat */
 void base4Omni(Coordinate v_target, float *motor1, float *motor2, float *motor3, float *motor4)
 {
-    *motor1 = (v_target.y + v_target.x)*SQRT2  + v_target.teta*R_BASE;  
-    *motor2 = (v_target.y - v_target.x)*SQRT2  + v_target.teta*R_BASE;
-    *motor3 = (-v_target.y - v_target.x)*SQRT2 + v_target.teta*R_BASE; 
-    *motor4 = (-v_target.y + v_target.x)*SQRT2 + v_target.teta*R_BASE; 
+    *motor3 = (-v_target.y + v_target.x)*SQRT2  + v_target.teta*R_BASE;  
+    *motor2 = (-v_target.y - v_target.x)*SQRT2  + v_target.teta*R_BASE;
+    *motor1 = (v_target.y - v_target.x)*SQRT2 + v_target.teta*R_BASE; 
+    *motor4 = (v_target.y + v_target.x)*SQRT2 + v_target.teta*R_BASE; 
 }
 

@@ -61,7 +61,7 @@
 /* sampling pid motor base */
 #define PID_MOTOR_SAMP 4173
 
-#define STICK_SAMP 10173
+#define STICK_SAMP 5173
 
 
 #endif

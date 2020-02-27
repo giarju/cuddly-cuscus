@@ -22,7 +22,7 @@
 #define SQRT2 1.41421356237f
 
 /* radius base */
-#define R_BASE 1.0f
+#define R_BASE 0.32f
 
 
 /************************* deklarasi fungsi  ***********************************/

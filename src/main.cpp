@@ -22,13 +22,14 @@
 #define MOTOR_DEBUG
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
-#define JOYSTICK_DEBUG
+// #define JOYSTICK_DEBUG
+#define TRACKING_DEBUG
 
 
 
 int counttt = 0;
-float a_target_speed_prev, a_target_speed_prev2;
-float a_target_accel, a_target_jerk;
+float joysamptime;
+float testy, testprevy = 0.2;
 /**************** function declaration ***********************/
 
 
@@ -81,16 +82,25 @@ void sendUart(char *buffer);
 void writeUart();
 
 /* 
- * prosedur untuk kontrol joystick
+ * prosedur untuk state joystick
  * 
  * */
 void stickState();
+
+/* 
+ * prosedur untuk sampling joystick
+ * 
+ * */
+void stickSamp();
 
 /* 
  * prosedur untuk kontrol joystick
  * 
  * */
 float trapeziumProfile(float amax, float TS, float prev_speed, uint32_t time);
+
+float trapeziumTarget(float amax, float vmax, float prev_speed, float TS);
+
 
 
 /******************* Main Function **************************/
@@ -99,7 +109,6 @@ int main ()
     /* initial setup */
     // Odometry.resetOdom();   
     profiler.start(); 
-    startMillis();
     stick.setup();
     stick.idle();
 
@@ -135,23 +144,28 @@ int main ()
         serial_ticker.attach_us(&pcSerialSamp, SERIAL_SAMP);
     #endif 
 
-    // #ifdef JOYSTICK_DEBUG
-    //     /* sampling komunikasi serial */
-    //     stick_ticker.attach_us(&stickState, STICK_SAMP);
-    // #endif 
+    #ifdef JOYSTICK_DEBUG
+        /* sampling komunikasi serial */
+        stick_ticker.attach_us(&stickSamp, STICK_SAMP);
+    #endif 
 
     while (1)
     {   
-        // wait(10.0);   
-        if (stick.readable()){
-            stick.baca_data();
-            stick.olah_data();
+        if(profiler.read_us() - last_time_joystick > STICK_SAMP ){
+            if (stick.readable()){
+                stick.baca_data();
+                stick.olah_data();
+                // sprintf(str_buffer, "r\n");
+            }
+            stickState();
+            last_time_joystick = profiler.read_us();
         }
-        stickState();
-            // prof_start1 = profiler.read_us();
-            // prof_end1 = profiler.read_us();
-            // diff1 = prof_end1 - prof_start1;
-            // pc.printf("");       
+            
+        // wait(10.0);   
+        // prof_start1 = profiler.read_us();
+        // prof_end1 = profiler.read_us();
+        // diff1 = prof_end1 - prof_start1;
+        // pc.printf("");       
     } 
 }
 
@@ -199,9 +213,9 @@ void encoderMotorSamp()  /* butuh 8 us */
 void motorSamp()
 {
     /* menggerakan motor base */
-    base_speed.x = 1;
-    base_speed.y = 1;
-    base_speed.teta = 1;
+    // base_speed.x = 1;
+    // base_speed.y = 1;
+    // base_speed.teta = 1;
 
     if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
     {
@@ -227,22 +241,16 @@ void motorSamp()
 void pidMotorSamp()
 {
 
-    a_target_speed = trapeziumProfile(-4, 0.004713, a_target_speed, profiler.read_us());
-    b_target_speed = trapeziumProfile(4, 0.004713, b_target_speed, profiler.read_us());
-    c_target_speed = trapeziumProfile(4, 0.004713, c_target_speed, profiler.read_us());
-    d_target_speed = trapeziumProfile(-4, 0.004713, d_target_speed, profiler.read_us());
-
-    a_target_accel = a_target_speed - a_target_speed_prev;
-    a_target_jerk = a_target_speed - 2*a_target_speed_prev + a_target_speed_prev2;
+    // a_target_speed = trapeziumProfile(-4, 0.004713, a_target_speed, profiler.read_us());
+    // b_target_speed = trapeziumProfile(4, 0.004713, b_target_speed, profiler.read_us());
+    // c_target_speed = trapeziumProfile(4, 0.004713, c_target_speed, profiler.read_us());
+    // d_target_speed = trapeziumProfile(-4, 0.004713, d_target_speed, profiler.read_us());
 
     /* menghitung pid motor base */
     A_pwm = A_pid_motor.createpwm(a_target_speed, a_motor_speed, 1);
     B_pwm = B_pid_motor.createpwm(b_target_speed, b_motor_speed, 1);
     C_pwm = C_pid_motor.createpwm(c_target_speed, c_motor_speed, 1);
     D_pwm = D_pid_motor.createpwm(d_target_speed, d_motor_speed, 1);
-
-    a_target_speed_prev2 = a_target_speed_prev;
-    a_target_speed_prev = a_target_speed;
     
 }
 #endif
@@ -269,8 +277,8 @@ void trackingSamp()
 void pcSerialSamp() /*1200 us untuk 16 karakter pc.printf*/ /* 20 us dgn attach*/
 {
     /* write string ke buffer 1 (str_buffer) */     
-    // sprintf(str_buffer, "%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f\n", a_motor_speed,b_motor_speed,c_motor_speed,d_motor_speed,A_pwm,B_pwm,C_pwm,D_pwm);
-    sprintf(str_buffer, "%.2f %.2f %.2f %.2f\n",  d_target_speed, d_motor_speed, D_pwm, b_motor_speed);
+    sprintf(str_buffer, "%.2f %.2f %.2f %d\n",  a_target_speed, joysamptime, a_motor_speed, profiler.read_us());
+    // sprintf(str_buffer, "%.2f\n",  a_target_speed);
     /* mengirimkan string melalui uart */
     sendUart(str_buffer);      
 }
@@ -336,19 +344,40 @@ float trapeziumProfile(float amax, float TS, float prev_speed, uint32_t time){
     }
 }
 
+float trapeziumTarget(float amax, float vmax, float prev_speed, float TS){
+    if(prev_speed < vmax && amax > 0){
+        return prev_speed + amax*TS;
+    }
+    else if(prev_speed > vmax && amax < 0){
+        return prev_speed + amax*TS;
+    }
+    else {
+        return vmax;
+    }
+}
+
+#ifdef JOYSTICK_DEBUG
+void stickSamp(){
+    // stick.baca_data();
+    // stick.olah_data();
+    // stickState();
+}
+#endif
+
 /* state joystick */
 void stickState(){
 //Procedure to read command from stick and take action
+
+    joysamptime = (profiler.read_us() - last_time_joystick) / 1000000;
     /* RESET STATE */ 
     if (stick.START){        
-        pc.printf("start \n");
+        // pc.printf("start \n");
         count_print = 0;
     } 
     else if (stick.SELECT){
         //pc.printf("select \n");
         while(count_select < 400){
-            pc.printf("%f %f %f %f %f %d\n", speed_array_a[count_select],speed_array_b[count_select],
-            speed_array_c[count_select],speed_array_d[count_select],time_array[count_select], count_select);
+            // pc.printf("%f %f %f %f %f %d\n", speed_array_a[count_select],speed_array_b[count_select],speed_array_c[count_select],speed_array_d[count_select],time_array[count_select], count_select);
             count_select++;
         }
     }
@@ -367,7 +396,7 @@ void stickState(){
             &&(!stick.R2)&&(!stick.R1)&&(!stick.L1)){
     //no input condition
         base_speed.x = 0;
-        base_speed.y = 0;
+        base_speed.y = trapeziumTarget(-0.2, 0, base_prev_speed.y, joysamptime);
         base_speed.teta = 0;
         statePrint = 0;
         //pc.printf("diam\n");
@@ -375,9 +404,8 @@ void stickState(){
     else if ((stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
     //stick up
         base_speed.x = 0;
-        base_speed.y = 2;
+        base_speed.y = trapeziumTarget(0.2, 2, base_prev_speed.y, joysamptime);
         base_speed.teta = 0;
-
         //pc.printf("atas\n");
     } 
     else if ((!stick.atas)&&(stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
@@ -480,7 +508,6 @@ void stickState(){
     }
     
     
-    
     //untuk pneumatik
     if(!stick.silang && !stick.lingkaran && !stick.kotak && !stick.segitiga){
         tembak = 1;
@@ -523,4 +550,9 @@ void stickState(){
         armKiri=1;
         armKanan=0;
     }
+
+    
+    base_prev_speed.x = base_speed.x;
+    base_prev_speed.y = base_speed.y;
+    base_prev_speed.teta = base_speed.teta;
 }

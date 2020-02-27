@@ -38,7 +38,7 @@ Ticker stick_ticker;
  * diff1       : perbedaan awal dan akhir*/
 uint32_t prof_start1, prof_end1, diff1;
 
-uint32_t lastTimeTangan;
+uint32_t lastTimeTangan, last_time_joystick;
 
 
 /********************** Pergerakan Base ******************************/
@@ -62,6 +62,7 @@ int index_traject;
 Trajectory map[100];
 /* kecapatan base, berisi nilai vx,vy,omega*/
 Coordinate base_speed;
+Coordinate base_prev_speed;
 
 
 /********************** PID Motor ******************************/
