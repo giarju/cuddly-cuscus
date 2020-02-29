@@ -240,6 +240,8 @@ void motorSamp()
         C_motor.speed(C_pwm); 
         D_motor.speed(D_pwm);
     }
+
+
 }
 #endif
 
@@ -249,18 +251,23 @@ void motorSamp()
  * */
 #ifdef PID_MOTOR_DEBUG
 void pidMotorSamp()
-{
+{   
 
     // a_target_speed = trapeziumProfile(-4, 0.004713, a_target_speed, profiler.read_us());
     // b_target_speed = trapeziumProfile(4, 0.004713, b_target_speed, profiler.read_us());
     // c_target_speed = trapeziumProfile(4, 0.004713, c_target_speed, profiler.read_us());
     // d_target_speed = trapeziumProfile(-4, 0.004713, d_target_speed, profiler.read_us());
-
+    
     /* menghitung pid motor base */
+
     A_pwm = A_pid_motor.createpwm(a_target_speed, a_motor_speed, 1);
     B_pwm = B_pid_motor.createpwm(b_target_speed, b_motor_speed, 1);
     C_pwm = C_pid_motor.createpwm(c_target_speed, c_motor_speed, 1);
     D_pwm = D_pid_motor.createpwm(d_target_speed, d_motor_speed, 1);
+
+
+    
+
     
 }
 #endif
@@ -275,7 +282,12 @@ void trackingSamp()
     /* menghitung kecepatan robot berdasarkan map dan posisi aktual*/
     // base_speed = velocityTracker(map[index_traject], Odometry.position); /* index harusnya dari fsm (index bahaya, shared variable sama fsm)*/
     /* menghitung kecepatan masing2 motor base */
+    baseTrapezoidProfile(&base_speed, &base_prev_speed, 7, 7, 1, TRACKING_SAMP/1000);
     base4Omni(base_speed, &a_target_speed, &b_target_speed, &c_target_speed, &d_target_speed);
+    
+    base_prev_speed.x = base_speed.x;
+    base_prev_speed.y = base_speed.y;
+    base_prev_speed.teta = base_speed.teta;
 }
 #endif
 
@@ -427,10 +439,10 @@ void stickState(){
 
     /* STICK ROTATION STATE */ 
     if ((stick.R1)){     
-        base_speed.teta = PI;
+        base_speed.teta = -2*PI;
     } 
     else if ((stick.L1)){
-        base_speed.teta = -PI;
+        base_speed.teta = 2*PI;
     }
 
     statePrint = 1;
@@ -441,6 +453,9 @@ void stickState(){
         base_speed.x = 0;
         base_speed.y = 0;;
         base_speed.teta = 0;
+        base_prev_speed.x = 0;
+        base_prev_speed.y = 0;
+        base_prev_speed.teta = 0;
         statePrint = 0;
         //pc.printf("diam\n");
     } 
@@ -599,7 +614,4 @@ void stickState(){
     }
 
     
-    base_prev_speed.x = base_speed.x;
-    base_prev_speed.y = base_speed.y;
-    base_prev_speed.teta = base_speed.teta;
 }

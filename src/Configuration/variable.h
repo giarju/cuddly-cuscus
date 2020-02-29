@@ -50,6 +50,7 @@ uint32_t lastTimeTangan, last_time_joystick;
 float a_motor_speed,b_motor_speed,c_motor_speed,d_motor_speed,right_arm_speed,left_arm_speed;
 /* x_target_speed: kecepatan target motor */
 float a_target_speed,b_target_speed,c_target_speed,d_target_speed;
+
 /* X_pwm         : pwm yang diberikan ke motor*/
 float A_pwm,B_pwm,C_pwm,D_pwm;
 float A_pwm_dzcompensated,B_pwm_dzcompensated,C_pwm_dzcompensated,D_pwm_dzcompensated;

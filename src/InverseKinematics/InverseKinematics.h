@@ -35,4 +35,8 @@
  */
 void base4Omni(Coordinate v_target, float *motor1, float *motor2, float *motor3, float *motor4);
 
+void trapeziodProfile(float *v_now, float *v_last, float t_s_in_ms);
+
+void baseTrapezoidProfile(Coordinate *base, Coordinate *base_last, float ax_max, float ay_max, float alfa_max, float t_s);
+
 #endif

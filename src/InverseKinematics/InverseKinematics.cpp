@@ -28,3 +28,30 @@ void base4Omni(Coordinate v_target, float *motor1, float *motor2, float *motor3,
     *motor4 = (-v_target.y + v_target.x)*SQRT2 + v_target.teta*R_BASE; 
 }
 
+
+/* 
+    Melakukan Trapezoidal Kinematics pembatasan kinematics
+    Input : alamat v_target, alamat v sebelumnya, percepatan max
+            time sampling
+    Output: Trapezoid profile
+*/
+void trapeziodProfile(float *v_target, float *v_last, float a_max, float t_s_in_ms){
+    float a_now = (*v_target - *v_last)*1000/t_s_in_ms;
+
+    if (fabs(a_now) > a_max){
+        *v_target = *v_last + (a_now*a_max*t_s_in_ms/(1000*fabs(a_now)));
+    }
+}
+
+/* 
+    Melakukan Trapezoidal Kinematics dengan struct base 
+    Input : adress base, adress base last, ax max, ay max
+            alfa max, time sampling
+    Output: Trapezoid profile
+*/
+void baseTrapezoidProfile(Coordinate *base, Coordinate *base_last, float ax_max, float ay_max, float alfa_max, float t_s){
+    trapeziodProfile(&(base->x), &(base_last->x),ax_max,t_s);
+    trapeziodProfile(&(base->y), &(base_last->y),ay_max,t_s);
+    trapeziodProfile(&(base->teta), &(base_last->teta),alfa_max, t_s);
+}
+
