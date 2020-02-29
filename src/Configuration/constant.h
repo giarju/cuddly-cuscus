@@ -55,13 +55,13 @@
 /* sampling komunikasi UART */
 #define SERIAL_SAMP 7173
 /* sampling gerak motor base */
-#define MOTOR_SAMP 9173
+#define MOTOR_SAMP 5173
 /* sampling tracking path */
 #define TRACKING_SAMP 5173
 /* sampling pid motor base */
 #define PID_MOTOR_SAMP 4173
 
-#define STICK_SAMP 5173
+#define STICK_SAMP 9173
 
 
 #endif

@@ -30,6 +30,7 @@
 int counttt = 0;
 float joysamptime;
 float testy, testprevy = 0.2;
+int speed_state;
 /**************** function declaration ***********************/
 
 
@@ -97,9 +98,11 @@ void stickSamp();
  * prosedur untuk kontrol joystick
  * 
  * */
-float trapeziumProfile(float amax, float TS, float prev_speed, uint32_t time);
+float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_speed, uint32_t initial_time, uint32_t time);
 
 float trapeziumTarget(float amax, float vmax, float prev_speed, float TS);
+
+void speedState();
 
 
 
@@ -150,14 +153,15 @@ int main ()
     #endif 
 
     while (1)
-    {   
+    {  
+        if (stick.readable()){
+            stick.baca_data();
+            stick.olah_data();
+        } 
         if(profiler.read_us() - last_time_joystick > STICK_SAMP ){
-            if (stick.readable()){
-                stick.baca_data();
-                stick.olah_data();
-                // sprintf(str_buffer, "r\n");
-            }
+
             stickState();
+            // sprintf(str_buffer, "k\n");
             last_time_joystick = profiler.read_us();
         }
             
@@ -217,6 +221,12 @@ void motorSamp()
     // base_speed.y = 1;
     // base_speed.teta = 1;
 
+    // A_pwm = ;
+    // B_pwm = 0;
+    // C_pwm = 0;
+    // D_pwm = 0.3;
+
+    
     if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
     {
         A_motor.forcebrake();
@@ -269,7 +279,6 @@ void trackingSamp()
 }
 #endif
 
-#ifdef SERIAL_DEBUG
 /* 
  * prosedur untuk print string dengan uart setiap sampling time
  * 
@@ -277,7 +286,7 @@ void trackingSamp()
 void pcSerialSamp() /*1200 us untuk 16 karakter pc.printf*/ /* 20 us dgn attach*/
 {
     /* write string ke buffer 1 (str_buffer) */     
-    sprintf(str_buffer, "%.2f %.2f %.2f %d\n",  a_target_speed, joysamptime, a_motor_speed, profiler.read_us());
+    sprintf(str_buffer, "%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f\n",  a_motor_speed, b_motor_speed, c_motor_speed, d_motor_speed, A_pwm, B_pwm, C_pwm, D_pwm);
     // sprintf(str_buffer, "%.2f\n",  a_target_speed);
     /* mengirimkan string melalui uart */
     sendUart(str_buffer);      
@@ -327,17 +336,42 @@ void writeUart() /* butuh 4 us */
     }
     CriticalSectionLock::disable();
 }
-#endif
     
-float trapeziumProfile(float amax, float TS, float prev_speed, uint32_t time){
-    if (time < 500000){
-        return prev_speed + amax*TS;
+float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_speed, uint32_t initial_time, uint32_t time){
+    // if (time < 500000){
+    //     return prev_speed + amax*TS;
+    // }
+    // else if ((500000 <= time) && (time < 4000000)){
+    //     return prev_speed;
+    // }
+    // else if ((4000000 <= time) && (time < 4500000)){
+    //     return prev_speed - amax*TS;
+    // }
+    // else {
+    //     return 0;
+    // }
+    volatile float T1 = vmax/amax;
+    volatile float T2 = T1 + (smax - amax*T1*T1)/vmax;
+    volatile float T3 = T2 + T1;
+
+    if ((time - initial_time) < T1){
+        if (prev_speed + amax*TS > vmax){
+            return vmax;
+        }
+        else{
+            return prev_speed + amax*TS;
+        }
     }
-    else if ((500000 <= time) && (time < 4000000)){
-        return prev_speed;
+    else if ((T1 <= (time - initial_time)) && ((time - initial_time) < T2)){
+        return vmax;
     }
-    else if ((4000000 <= time) && (time < 4500000)){
-        return prev_speed - amax*TS;
+    else if ((T2 <= (time - initial_time)) && ((time - initial_time) < T3)){
+        if (prev_speed - amax*TS < 0){
+            return 0;
+        }
+        else{
+            return prev_speed - amax*TS;
+        }     
     }
     else {
         return 0;
@@ -364,6 +398,13 @@ void stickSamp(){
 }
 #endif
 
+// void speedState(){
+//     if (speed_state = 0){
+
+//     }
+// }
+
+
 /* state joystick */
 void stickState(){
 //Procedure to read command from stick and take action
@@ -371,7 +412,9 @@ void stickState(){
     joysamptime = (profiler.read_us() - last_time_joystick) / 1000000;
     /* RESET STATE */ 
     if (stick.START){        
-        // pc.printf("start \n");
+        sprintf(str_buffer, "start\n");
+        sendUart(str_buffer);      
+        // pc.printf("start\n");
         count_print = 0;
     } 
     else if (stick.SELECT){
@@ -384,10 +427,10 @@ void stickState(){
 
     /* STICK ROTATION STATE */ 
     if ((stick.R1)){     
-        base_speed.teta = PI/2;
+        base_speed.teta = PI;
     } 
     else if ((stick.L1)){
-        base_speed.teta = -PI/2;
+        base_speed.teta = -PI;
     }
 
     statePrint = 1;
@@ -396,7 +439,7 @@ void stickState(){
             &&(!stick.R2)&&(!stick.R1)&&(!stick.L1)){
     //no input condition
         base_speed.x = 0;
-        base_speed.y = trapeziumTarget(-0.2, 0, base_prev_speed.y, joysamptime);
+        base_speed.y = 0;;
         base_speed.teta = 0;
         statePrint = 0;
         //pc.printf("diam\n");
@@ -404,7 +447,7 @@ void stickState(){
     else if ((stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
     //stick up
         base_speed.x = 0;
-        base_speed.y = trapeziumTarget(0.2, 2, base_prev_speed.y, joysamptime);
+        base_speed.y = 2;
         base_speed.teta = 0;
         //pc.printf("atas\n");
     } 
@@ -506,7 +549,11 @@ void stickState(){
         base_speed.y = -1.5*3/5;
         base_speed.teta = 0;
     }
-    
+    else if ((stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
+    //stick up
+        speed_state = 1;
+        //pc.printf("atas\n");
+    } 
     
     //untuk pneumatik
     if(!stick.silang && !stick.lingkaran && !stick.kotak && !stick.segitiga){
