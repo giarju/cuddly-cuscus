@@ -18,12 +18,13 @@
 /******************** Aktivasi Debug ************************/
 
 // #define ODOMETRY_DEBUG 
-// #define SERIAL_DEBUG 
+#define SERIAL_DEBUG 
 #define MOTOR_DEBUG
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
 // #define JOYSTICK_DEBUG
 #define TRACKING_DEBUG
+#define PENGAMAN_PWM
 
 
 
@@ -103,6 +104,10 @@ float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_s
 float trapeziumTarget(float amax, float vmax, float prev_speed, float TS);
 
 void speedState();
+
+float max (float a, float b);
+
+float min (float a, float b);
 
 
 
@@ -200,6 +205,7 @@ void encoderMotorSamp()  /* butuh 8 us */
     d_motor_speed = (float)D_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
     right_arm_speed = (float)right_arm_enc.getPulses()*360*180/(124.46*ENC_MOTOR_PULSE);
     //left_arm_speed = (float)left_arm_enc.getPulses()*2*PI/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+
     
     /* reset nilai encoder */
     A_enc.reset();
@@ -220,28 +226,50 @@ void motorSamp()
     // base_speed.x = 1;
     // base_speed.y = 1;
     // base_speed.teta = 1;
-
-    // A_pwm = ;
-    // B_pwm = 0;
-    // C_pwm = 0;
-    // D_pwm = 0.3;
+    // if (stick.atas){
+    //     A_pwm = 0.3;
+    //     B_pwm = 0.3;
+    //     C_pwm = 0.3;
+    //     D_pwm = 0.3;
+    // }
+    // else if (stick.bawah){
+    //     A_pwm = -0.3;
+    //     B_pwm = -0.3;
+    //     C_pwm = -0.3;
+    //     D_pwm = -0.3;
+    // }
 
     
-    if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
-    {
-        A_motor.forcebrake();
-        B_motor.forcebrake();
-        C_motor.forcebrake(); 
-        D_motor.forcebrake();
-    }
-    else{      
+    // if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
+    // {
+    //     A_motor.forcebrake();
+    //     B_motor.forcebrake();
+    //     C_motor.forcebrake(); 
+    //     D_motor.forcebrake();
+    // }
+    // else{      
+        //#ifdef PENGAMAN_PWM
+            float max_pwm = 0.3;
+            // if (fabs(A_pwm) >= max_pwm+0.001){
+            //     A_pwm = max_pwm*fabs(A_pwm)/A_pwm;
+            // }
+            // if (fabs(B_pwm) >= max_pwm+0.001){
+            //     B_pwm = max_pwm*fabs(B_pwm)/B_pwm;
+            // }
+            // if (fabs(C_pwm) >= max_pwm+0.001){
+            //     C_pwm = max_pwm*fabs(C_pwm)/C_pwm;
+            // }
+            // if (fabs(D_pwm) >= max_pwm+0.001){
+            //     D_pwm = max_pwm*fabs(D_pwm)/D_pwm;
+            // }
+            
+        //#endif
+
         A_motor.speed(A_pwm);
         B_motor.speed(B_pwm);
         C_motor.speed(C_pwm); 
         D_motor.speed(D_pwm);
-    }
-
-
+    // }
 }
 #endif
 
@@ -259,13 +287,16 @@ void pidMotorSamp()
     // d_target_speed = trapeziumProfile(-4, 0.004713, d_target_speed, profiler.read_us());
     
     /* menghitung pid motor base */
-
+    float max_pwm = 0.3;
     A_pwm = A_pid_motor.createpwm(a_target_speed, a_motor_speed, 1);
     B_pwm = B_pid_motor.createpwm(b_target_speed, b_motor_speed, 1);
     C_pwm = C_pid_motor.createpwm(c_target_speed, c_motor_speed, 1);
     D_pwm = D_pid_motor.createpwm(d_target_speed, d_motor_speed, 1);
 
-
+    A_pwm = fabs(A_pwm) >= max_pwm ? fabs(A_pwm)*max_pwm/A_pwm : A_pwm;
+    B_pwm = fabs(B_pwm) >= max_pwm ? fabs(B_pwm)*max_pwm/B_pwm : B_pwm;
+    C_pwm = fabs(C_pwm) >= max_pwm ? fabs(C_pwm)*max_pwm/C_pwm : C_pwm;
+    D_pwm = fabs(D_pwm) >= max_pwm ? fabs(D_pwm)*max_pwm/D_pwm : D_pwm;
     
 
     
@@ -282,7 +313,7 @@ void trackingSamp()
     /* menghitung kecepatan robot berdasarkan map dan posisi aktual*/
     // base_speed = velocityTracker(map[index_traject], Odometry.position); /* index harusnya dari fsm (index bahaya, shared variable sama fsm)*/
     /* menghitung kecepatan masing2 motor base */
-    baseTrapezoidProfile(&base_speed, &base_prev_speed, 7, 7, 1, TRACKING_SAMP/1000);
+    baseTrapezoidProfile(&base_speed, &base_prev_speed,2, 2, 1, TRACKING_SAMP/1000);
     base4Omni(base_speed, &a_target_speed, &b_target_speed, &c_target_speed, &d_target_speed);
     
     base_prev_speed.x = base_speed.x;
@@ -453,89 +484,86 @@ void stickState(){
         base_speed.x = 0;
         base_speed.y = 0;;
         base_speed.teta = 0;
-        base_prev_speed.x = 0;
-        base_prev_speed.y = 0;
-        base_prev_speed.teta = 0;
         statePrint = 0;
         //pc.printf("diam\n");
     } 
     else if ((stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
     //stick up
         base_speed.x = 0;
-        base_speed.y = 2;
+        base_speed.y = 1;
         base_speed.teta = 0;
         //pc.printf("atas\n");
     } 
     else if ((!stick.atas)&&(stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
     //stick down
         base_speed.x = 0;
-        base_speed.y = -2;
+        base_speed.y = -1;
         base_speed.teta = 0;
         //pc.printf("bawah\n");
     } 
     else if ((!stick.atas)&&(!stick.bawah)&&(stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
     //stick right
-        base_speed.x = 2;
+        base_speed.x = 1;
         base_speed.y = 0;
         base_speed.teta = 0;
         //pc.printf("kiri\n");
     } 
     else if ((!stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(stick.kiri)&&(!stick.R2)){
     //stick left
-        base_speed.x = -2;
+        base_speed.x = -1;
         base_speed.y = 0;
         base_speed.teta = 0;
         //pc.printf("kanan\n");
     } 
     else if ((stick.atas)&&(!stick.bawah)&&(stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
     //stick right up
-        base_speed.x = 1.5;
-        base_speed.y = 1.5;
+        base_speed.x = 1.5/2;
+        base_speed.y = 1.5/2;
         base_speed.teta = 0;
     } 
     else if ((stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(stick.kiri)&&(!stick.R2)){
     //stick left up
-        base_speed.x = -1.5;
-        base_speed.y = 1.5;
+        base_speed.x = -1.5/2;
+        base_speed.y = 1.5/2;
         base_speed.teta = 0;
     } 
     else if ((!stick.atas)&&(stick.bawah)&&(stick.kanan)&&(!stick.kiri)&&(!stick.R2)){ 
     //stick right down
-        base_speed.x = 1.5;
-        base_speed.y = -1.5;
+        base_speed.x = 1.5/2;
+        base_speed.y = -1.5/2;
         base_speed.teta = 0;
     } 
     else if ((!stick.atas)&&(stick.bawah)&&(!stick.kanan)&&(stick.kiri)&&(!stick.R2)){
         //stick left down
-        base_speed.x = -1.5;
-        base_speed.y = -1.5;
+        base_speed.x = -1.5/2;
+        base_speed.y = -1.5/2;
         base_speed.teta = 0;
     }
     //mode lambat
     else if ((stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(stick.R2)){
     //stick up
         base_speed.x = 0;
-        base_speed.y = 0.75;
+        base_speed.y = 0.75/2;
         base_speed.teta = 0;
         //pc.printf("atas\n");
     } 
     else if ((!stick.atas)&&(stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(stick.R2)){
     //stick down
         base_speed.x = 0;
-        base_speed.y = -0.75;
+        base_speed.y = -0.75/2;
         base_speed.teta = 0;
         //pc.printf("bawah\n");
     } 
     else if ((!stick.atas)&&(!stick.bawah)&&(stick.kanan)&&(!stick.kiri)&&(stick.R2)){
     //stick right
-        base_speed.x = 0.75;
+        base_speed.x = 0.75/2;
         base_speed.y = 0;
         base_speed.teta = 0;
         //pc.printf("kiri\n");
     } 
     else if ((!stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(stick.kiri)&&(stick.R2)){
     //stick left
-        base_speed.x = -0.75;
+        base_speed.x = -0.75/2;
         base_speed.y = 0;
         base_speed.teta = 0;
         //pc.printf("kanan\n");
@@ -614,4 +642,12 @@ void stickState(){
     }
 
     
+}
+
+float max(float a, float b){
+    return 0.5*(fabs(a)+fabs(b)+fabs(fabs(a)-fabs(b)));
+}
+
+float min(float a, float b){
+    return 0.5*(fabs(a)+fabs(b)-fabs(fabs(a)-fabs(b)));
 }
