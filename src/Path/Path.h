@@ -31,7 +31,21 @@ typedef struct Trajectory_t
    Coordinate distance;
 }Trajectory;
 
+/*mencari posisi saat ini*/
 
+Trajectory setTrajectory(Coordinate velocity, Coordinate distance){
+   Trajectory Track;
+   Track.velocity.x = velocity.x;
+   Track.velocity.y = velocity.y;
+   Track.velocity.theta = velocity.theta;
+   Track.distance.x = distance.x;
+   Track.distance.y = distance.y;
+   Track.distance.theta = distance.theta;
+
+   return Track;
+
+}
+#in
 //Get x,y,teta,v at current point
 Coordinate getPoint (int index, Coordinate *path);
 /*******************************************

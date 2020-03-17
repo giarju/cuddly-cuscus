@@ -1,5 +1,5 @@
-/* mbed simple H-bridge motor controller
- * Copyright (c) 2007-2010, sford
+/* mbed Microcontroller Library
+ * Copyright (c) 2006-2012 ARM Limited
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -16,51 +16,35 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
+#ifndef MBED_FATFILEHANDLE_H
+#define MBED_FATFILEHANDLE_H
 
-#include "Motor.h"
+#include "FileHandle.h"
 
-Motor::Motor(PinName pwm, PinName fwd, PinName rev):
-        _pwm(pwm), _fwd(fwd), _rev(rev) {
+using namespace mbed;
 
-    // Set initial condition of PWM
-    _pwm.period(0.0005);
-    _pwm = 0;
+class FATFileHandle : public FileHandle {
+public:
 
-    // Initial condition of output enables
-    _fwd = 0;
-    _rev = 0;
-}
+    FATFileHandle(FIL fh);
+    virtual int close();
+    virtual ssize_t write(const void* buffer, size_t length);
+    virtual ssize_t read(void* buffer, size_t length);
+    virtual int isatty();
+    virtual off_t lseek(off_t position, int whence);
+    virtual int fsync();
+    virtual off_t flen();
+    
+    virtual off_t seek(off_t position, int whence) { return lseek(position, whence); }
+    virtual off_t size() { return flen(); }
 
-void Motor::speed(float speed) {
-    _fwd = (speed > (float)0.0);
-    _rev = (speed < (float)0.0);
-    _pwm = fabs(speed);
-}
+protected:
+    
+    FIL _fh;
 
-void Motor::period(float period){
+};
 
-    _pwm.period(period);
-
-}
-
-void Motor::brake(int highLow){
-
-    if(highLow == BRAKE_HIGH){
-        _fwd = 1;
-        _rev = 1;
-    }
-    else if(highLow == BRAKE_LOW){
-        _fwd = 0;
-        _rev = 0;
-    }
-
-}
-
-void Motor::forcebrake(){
-    _pwm = 1.0;
-    _fwd = 1;
-    _rev = 1;
-}
+#endif
