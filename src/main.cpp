@@ -20,21 +20,11 @@
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
 #define TRACKING_DEBUG
-<<<<<<< HEAD
-// #define PENGAMAN_PWM
 
-
-
-int counttt = 0;
-float joysamptime;
-float testy, testprevy = 0.2;
-int speed_state;
 float lastThetaRobot = 0;
 float totalThetaRobot = 0;
-=======
 
 
->>>>>>> f7635683e9de5c0a00b7c2eb8ad3744d3cef24d7
 /**************** function declaration ***********************/
 void encoderMotorSamp();
 
@@ -196,24 +186,6 @@ void motorSamp()
     B_motor.speed(B_pwm);
     C_motor.speed(C_pwm); 
     D_motor.speed(D_pwm);
-    
-<<<<<<< HEAD
-    if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
-    {
-        A_motor.forcebrake();
-        B_motor.forcebrake();
-        C_motor.forcebrake(); 
-        D_motor.forcebrake();
-    }
-    else{      
-
-        A_motor.speed(A_pwm);
-        B_motor.speed(B_pwm);
-        C_motor.speed(C_pwm); 
-        D_motor.speed(D_pwm);
-    }
-=======
->>>>>>> f7635683e9de5c0a00b7c2eb8ad3744d3cef24d7
 }
 #endif
 
@@ -312,20 +284,6 @@ void writeUart() /* butuh 4 us */
     CriticalSectionLock::disable();
 }
     
-
-
-<<<<<<< HEAD
-#ifdef JOYSTICK_DEBUG
-void stickSamp(){
-    // stick.baca_data();
-    // stick.olah_data();
-    // stickState();
-}
-#endif
-
-
-=======
->>>>>>> f7635683e9de5c0a00b7c2eb8ad3744d3cef24d7
 
 /* state joystick */
 void stickState(){
