@@ -84,8 +84,6 @@ Coordinate distance[3]={
         {0,  0,   0,   0},
 }
 
-/* posisi robot */
-Coordinate base_position;
 
 /* kecapatan base, berisi nilai vx,vy,omega*/
 Coordinate base_speed;
