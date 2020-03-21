@@ -17,11 +17,11 @@
 /*************************** definisi fungsi ******************************/
 
 /* Melakukan keputusan untuk pindah ke titik selanjutnya pada trajectory map */
-int nextIndex(Trajectory trajectory_map, Coordinate current_pos, int index)
+int nextIndex(Coordinate trajectory_map, Coordinate current_pos, int index)
 {
     /* menghitung jarak robot ke titik target */
-    double dist_to_next = sqrt(pow((trajectory_map.distance.x - current_pos.x),2) + 
-                               pow((trajectory_map.distance.y - current_pos.y),2));
+    double dist_to_next = sqrt(pow(( trajectory_map.x - current_pos.x),2) + 
+                               pow(( trajectory_map.y - current_pos.y),2));
     
 
     /* pindah ke target berikutnya jika sudah berada pada 

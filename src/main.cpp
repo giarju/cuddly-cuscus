@@ -22,23 +22,10 @@
 #define MOTOR_DEBUG
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
-#define JOYSTICK_DEBUG
 #define TRACKING_DEBUG
 
 
 /**************** function declaration ***********************/
-
-
-/* 
- * prosedur untuk melakukan sampling odometri base
- * 
- * */
-void odometrySamp();
-
-/* 
- * prosedur untuk melakukan sampling encoder motor base
- * 
- * */
 void encoderMotorSamp();
 
 /* 
@@ -90,6 +77,12 @@ void stickState();
 float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_speed, uint32_t initial_time, uint32_t time);
 
 float trapeziumTarget(float amax, float vmax, float prev_speed, float TS);
+
+int nextIndex(Trajectory trajectory_map, Coordinate current_pos, int index);
+
+float computeAlpha(Coordinate next_pos, Coordinate current_pos);
+
+
 
 /******************* Main Function **************************/
 int main ()
@@ -153,14 +146,7 @@ int main ()
         // prof_end1 = profiler.read_us();
         // diff1 = prof_end1 - prof_start1;
         // pc.printf("");       
-    } 
-}
 
-
-/* 
- * prosedur untuk melakukan sampling odometri base
- * 
- * */
 #ifdef ODOMETRY_DEBUG
 void odometrySamp ()  /*butuh 48018 us */  
 {  
@@ -464,99 +450,15 @@ void stickState(){
         base_speed.teta = 0;
         //pc.printf("atas\n");
     } 
-    else if ((!stick.atas)&&(stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(stick.R2)){
-    //stick down
-        base_speed.x = 0;
-        base_speed.y = -0.75/2;
-        base_speed.teta = 0;
-        //pc.printf("bawah\n");
     } 
-    else if ((!stick.atas)&&(!stick.bawah)&&(stick.kanan)&&(!stick.kiri)&&(stick.R2)){
-    //stick right
-        base_speed.x = 0.75/2;
-        base_speed.y = 0;
-        base_speed.teta = 0;
-        //pc.printf("kiri\n");
-    } 
-    else if ((!stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(stick.kiri)&&(stick.R2)){
-    //stick left
-        base_speed.x = -0.75/2;
-        base_speed.y = 0;
-        base_speed.teta = 0;
-        //pc.printf("kanan\n");
-    } 
-    else if ((stick.atas)&&(!stick.bawah)&&(stick.kanan)&&(!stick.kiri)&&(stick.R2)){
-    //stick right up
-        base_speed.x = 1.5*3/5;
-        base_speed.y = 1.5*3/5;
-        base_speed.teta = 0;
-    } 
-    else if ((stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(stick.kiri)&&(stick.R2)){
-    //stick left up
-        base_speed.x = -1.5*3/5;
-        base_speed.y = 1.5*3/5;
-        base_speed.teta = 0;
-    } 
-    else if ((!stick.atas)&&(stick.bawah)&&(stick.kanan)&&(!stick.kiri)&&(stick.R2)){ 
-    //stick right down
-        base_speed.x = 1.5*3/5;
-        base_speed.y = -1.5*3/5;
-        base_speed.teta = 0;
-    } 
-    else if ((!stick.atas)&&(stick.bawah)&&(!stick.kanan)&&(stick.kiri)&&(stick.R2)){
-        //stick left down
-        base_speed.x = -1.5*3/5;
-        base_speed.y = -1.5*3/5;
-        base_speed.teta = 0;
-    }
-    else if ((stick.atas)&&(!stick.bawah)&&(!stick.kanan)&&(!stick.kiri)&&(!stick.R2)){
-    //stick up
-        speed_state = 1;
-        //pc.printf("atas\n");
-    } 
-    
-    //untuk pneumatik
-    if(!stick.silang && !stick.lingkaran && !stick.kotak && !stick.segitiga){
-        tembak = 1;
-    }
-    else if(!stick.silang && stick.lingkaran && !stick.kotak && !stick.segitiga){
-        if(millis()-lastTimeTangan>500){
-            if(state_kiri){
-                armKiri=!armKiri;
-            }
-            else{
-                armKanan=!armKanan;
-            }
-            lastTimeTangan=millis();
-        }
-    }
-    else if(!stick.silang && !stick.lingkaran && !stick.kotak && stick.segitiga){
-        tembak = 0;
-        count_select = 0;
-    }
+}
 
-    if(stick.R1){
-        if(count_print < 400 && statePrint == 1 && millis() - time_s > 3){
-            speed_array_a[count_print] = a_motor_speed;
-            speed_array_b[count_print] = b_motor_speed;
-            speed_array_c[count_print] = c_motor_speed;
-            speed_array_d[count_print] = d_motor_speed;
-            time_array[count_print] = millis();
-            count_print++;
-            time_s = millis();
-        }
-    }
-    //Ganti lapangan
-    if(stick.L3){
-        state_kiri=1;
-        armKiri=0;
-        armKanan=1;
-    }
-    if(stick.R3){
-        state_kiri=0;
-        armKiri=1;
-        armKanan=0;
-    }
-
-    
+void gerakAuto(){
+    index_curr_pos = 0;
+    index_next_pos = nextIndex(distance[index_curr_pos+1], Odometry.position, index_curr_pos); // baca indeks berikutnya
+    v_resultan = vwGenerator(distance[index_next_pos],Odometry.position, distance[index_curr_pos-1], float accel, float decel, float saturation); //cari kecepatan target,input accel, decel, saturation
+    alpha= computeAlpha(distance[index_next_pos], Odometry.position); // 
+    velocity.x = v_resultan*cos(alpha);
+    velocity.y = v_resultan*sin(alpha);
+    velocity.theta = v_resultan;
 }
