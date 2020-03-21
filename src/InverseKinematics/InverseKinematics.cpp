@@ -70,14 +70,14 @@ float thetaFeedback(float omega_now ,float theta_now ,float theta_destination, f
     float theta_bound = 1;
 
     if (omega_now == 0){
-        om = kp*(theta_destination - theta_now) + (kd*1000*(theta_now - last_theta)/t_s_in_ms) + ki*(*total_theta);
+        om = kp*(theta_destination - theta_now) + (kd*1000*(theta_now - *last_theta)/t_s_in_ms) + ki*(*total_theta);
     }
     else{
         om = omega_now;
     }
 
     *last_theta = theta_now;
-    if (fabs(theta_now - theta_destination) < theta_bound && active){
+    if (fabs(theta_now - theta_destination) < theta_bound && omega_now == 0){
         *total_theta += (*last_theta + theta_now)*t_s_in_ms/2000;  // trapezoid
     }
     else{

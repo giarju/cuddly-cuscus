@@ -239,7 +239,7 @@ void trackingSamp()
     // base_speed = velocityTracker(map[index_traject], Odometry.position); /* index harusnya dari fsm (index bahaya, shared variable sama fsm)*/
     /* menghitung kecepatan masing2 motor base */
     
-    base_speed.teta = thetaFeedback(base_speed.teta,base_position.teta,&lastThetaRobot, &totalThetaRobot, TRACKING_SAMP/1000);
+    base_speed.teta = thetaFeedback(base_speed.teta,Odometry.position.teta,&lastThetaRobot, &totalThetaRobot, TRACKING_SAMP/1000);
     baseTrapezoidProfile(&base_speed, &base_prev_speed,2, 2, 1, TRACKING_SAMP/1000);
     base4Omni(base_speed, &a_target_speed, &b_target_speed, &c_target_speed, &d_target_speed);
     
@@ -331,11 +331,11 @@ void stickState(){
     /* STICK ROTATION STATE */ 
     if ((stick.R1)){     
         base_speed.teta = -2*PI;
-        theta_destination = base_position.teta;
+        theta_destination = Odometry.position.teta;
     } 
     else if ((stick.L1)){
         base_speed.teta = 2*PI;
-        theta_destination = base_position.teta;
+        theta_destination = Odometry.position.teta;
     }
 
     statePrint = 1;
@@ -346,7 +346,7 @@ void stickState(){
         base_speed.x = 0;
         base_speed.y = 0;;
         base_speed.teta = 0;
-        theta_destination = base_position.teta;
+        theta_destination = Odometry.position.teta;
         statePrint = 0;
         //pc.printf("diam\n");
     } 
