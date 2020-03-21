@@ -38,7 +38,15 @@ Ticker stick_ticker;
  * diff1       : perbedaan awal dan akhir*/
 uint32_t prof_start1, prof_end1, diff1;
 
+/* variable untuk menyimpan waktu terakhir sampling
+ *
+ * @param lastTimeTangan : sampling tangan 
+ * @param last_time_joystick   : sampling terakhir joystick
+ * @param joysamptime       : sampling time joystick
+ */
 uint32_t lastTimeTangan, last_time_joystick;
+float joysamptime;
+
 
 
 /********************** Pergerakan Base ******************************/
@@ -55,16 +63,36 @@ float a_target_speed,b_target_speed,c_target_speed,d_target_speed;
 float A_pwm,B_pwm,C_pwm,D_pwm;
 float A_pwm_dzcompensated,B_pwm_dzcompensated,C_pwm_dzcompensated,D_pwm_dzcompensated;
 
-/* variable untuk menyimpan trajectory */
+/* variable untuk menyimpan `trajectory */
 
 /* i-th point dari map trajectory*/
-int index_traject;
-/* Map trajectory, berisi nilai x,y,theta dan vx,vy,omega*/
-Trajectory map[100];
+int index_curr_pos;
+/* i-th point dari map trajectory*/
+int index_next_pos;
+
+/* Map trajectory, berisi nilai vx,vy,omega*/
+Coordinate velocity[3] ={
+        {0, 3, 3, 3, 0},
+        {0, 3, 3, 3, 0},
+        {0, 0, 0, 0, 0},
+};
+
+/* Map trajectory, berisi nilai jarak x,jarak y, selisih theta */
+Coordinate distance[3]={
+        {0,  0,   100, 100},
+        {0,  100, 100, 0},
+        {0,  0,   0,   0},
+}
+
 /* kecapatan base, berisi nilai vx,vy,omega*/
 Coordinate base_speed;
 Coordinate base_prev_speed;
 
+/*pembacaan kecepatan base_motor*/
+float v_resultan;
+
+/*pembacaan sudut dari current position ke titik target */
+float alpha;
 
 /********************** PID Motor ******************************/
 

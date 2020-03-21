@@ -78,7 +78,11 @@ int nextIndex(Trajectory trajectory_map, Coordinate current_pos, int index);
  * @param next_point : titik target yang dituju oleh robot
  * @param current_pos : titik koordinat robot saat ini 
  */
+<<<<<<< HEAD
 Coordinate velocityTracker(Trajectory next_point, Coordinate  current_pos);
+=======
+Coordinate velocityTracker(Coordinate next_point, Coordinate  current_pos);
+>>>>>>> path
 
 /*
  * Menghitung arah gerak robot berdasarkan posisi robot dan target
