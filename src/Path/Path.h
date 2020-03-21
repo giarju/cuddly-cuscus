@@ -37,15 +37,15 @@ Trajectory setTrajectory(Coordinate velocity, Coordinate distance){
    Trajectory Track;
    Track.velocity.x = velocity.x;
    Track.velocity.y = velocity.y;
-   Track.velocity.theta = velocity.theta;
+   Track.velocity.teta = velocity.teta;
    Track.distance.x = distance.x;
    Track.distance.y = distance.y;
-   Track.distance.theta = distance.theta;
+   Track.distance.teta = distance.teta;
 
    return Track;
 
 }
-#in
+
 //Get x,y,teta,v at current point
 Coordinate getPoint (int index, Coordinate *path);
 /*******************************************

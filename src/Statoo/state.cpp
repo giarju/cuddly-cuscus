@@ -32,7 +32,7 @@ FSM::~FSM()
 void FSM::fsmAuto(Coordinate currPos)
 {
     bool irCondition;
-    if (lapaganMerah)
+    if (lapanganMerah)
     {
         irCondition = irRight;
     }

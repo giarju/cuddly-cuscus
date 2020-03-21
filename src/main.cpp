@@ -5,9 +5,6 @@
  * 
  ***************************************************************************/
 
-//to do : make critical section on function
-//to do : 
-
 /********************** Library ******************************/
 
 #include "mbed.h"
@@ -27,13 +24,9 @@
 
 
 
-int counttt = 0;
-float joysamptime;
-float testy, testprevy = 0.2;
-int speed_state;
 float lastThetaRobot = 0;
 float totalThetaRobot = 0;
-float teta_destination = 0;
+float theta_destination = 0;
 
 
 /**************** function declaration ***********************/
@@ -86,13 +79,7 @@ void stickState();
  * 
  * */
 float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_speed, uint32_t initial_time, uint32_t time);
-
 float trapeziumTarget(float amax, float vmax, float prev_speed, float TS);
-
-int nextIndex(Trajectory trajectory_map, Coordinate current_pos, int index);
-
-float computeAlpha(Coordinate next_pos, Coordinate current_pos);
-
 
 
 /******************* Main Function **************************/
@@ -180,7 +167,6 @@ void encoderMotorSamp()  /* butuh 8 us */
     c_motor_speed = (float)C_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
     d_motor_speed = (float)D_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
 
-    
     /* reset nilai encoder */
     A_enc.reset();
     B_enc.reset();
@@ -196,6 +182,7 @@ void encoderMotorSamp()  /* butuh 8 us */
 #ifdef MOTOR_DEBUG
 void motorSamp()
 {
+<<<<<<< HEAD
     
 <<<<<<< HEAD
     if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
@@ -214,6 +201,13 @@ void motorSamp()
     }
 =======
 >>>>>>> f7635683e9de5c0a00b7c2eb8ad3744d3cef24d7
+=======
+    /* menggerakan motor base */
+    A_motor.speed(A_pwm);
+    B_motor.speed(B_pwm);
+    C_motor.speed(C_pwm); 
+    D_motor.speed(D_pwm);
+>>>>>>> 8b1b467204a3d6ee7d4fd157ed5e70af96e57089
 }
 #endif
 
@@ -313,20 +307,6 @@ void writeUart() /* butuh 4 us */
     CriticalSectionLock::disable();
 }
     
-
-
-<<<<<<< HEAD
-#ifdef JOYSTICK_DEBUG
-void stickSamp(){
-    // stick.baca_data();
-    // stick.olah_data();
-    // stickState();
-}
-#endif
-
-
-=======
->>>>>>> f7635683e9de5c0a00b7c2eb8ad3744d3cef24d7
 
 /* state joystick */
 void stickState(){

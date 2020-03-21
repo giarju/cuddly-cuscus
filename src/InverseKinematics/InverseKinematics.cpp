@@ -69,8 +69,13 @@ float thetaFeedback(float omega_now ,float theta_now ,float theta_destination, f
     float om  = 0;
     float theta_bound = 1;
 
+<<<<<<< HEAD
     if (omega_now == 0){
         om = kp*(theta_destination - theta_now) + (kd*1000*(theta_now - last_theta)/t_s_in_ms) + ki*(*total_theta);
+=======
+    if (active){
+        om = kp*(theta_destination - theta_now) + (kd*(theta_now - *last_theta)/t_s_in_ms) + *total_theta*ki;
+>>>>>>> 8b1b467204a3d6ee7d4fd157ed5e70af96e57089
     }
     else{
         om = omega_now;
