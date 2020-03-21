@@ -70,7 +70,7 @@ float thetaFeedback(int active ,float theta_now , float *last_theta, float *tota
     float theta_bound = 1;
 
     if (active){
-        om = kp*(theta_destination - theta_now) + (kd*(theta_now - last_theta)/t_s_in_ms) + ki*(*total_theta);
+        om = kp*(theta_destination - theta_now) + (kd*(theta_now - *last_theta)/t_s_in_ms) + *total_theta*ki;
     }
     else{
         om = 0;

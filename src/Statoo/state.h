@@ -1,6 +1,6 @@
-#include "../Tracking/Tracking.h"
-#include "../Path/Path.h"
-#include "../JoystickPS3/JoystickPS3.h"
+#include "Tracking/Tracking.h"
+#include "Path/Path.h"
+#include "JoystickPS3/JoystickPS3.h"
 
 class FSM
 {

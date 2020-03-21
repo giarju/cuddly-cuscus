@@ -48,7 +48,7 @@ encoderKRAI C_enc(PIN_C_CHA, PIN_C_CHB, 538, encoderKRAI::X4_ENCODING);
 /* encoder untuk motor D base */ 
 encoderKRAI D_enc(PIN_D_CHA, PIN_D_CHB, 538, encoderKRAI::X4_ENCODING);
 /* encoder untuk motor kanan arm */ 
-encoderKRAI right_arm_enc(PIN_ARM_RIGHT_CHA, PIN_ARM_RIGHT_CHB, 538, encoderKRAI::X4_ENCODING);
+// encoderKRAI right_arm_enc(PIN_ARM_RIGHT_CHA, PIN_ARM_RIGHT_CHB, 538, encoderKRAI::X4_ENCODING);
 /* encoder untuk motor kanan arm */ 
 //encoderKRAI left_arm_enc(PIN_ARM_LEFT_CHA, PIN_ARM_LEFT_CHB, 538, encoderKRAI::X4_ENCODING);
 
