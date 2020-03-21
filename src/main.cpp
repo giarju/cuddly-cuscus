@@ -5,9 +5,6 @@
  * 
  ***************************************************************************/
 
-//to do : make critical section on function
-//to do : 
-
 /********************** Library ******************************/
 
 #include "mbed.h"
@@ -75,13 +72,7 @@ void stickState();
  * 
  * */
 float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_speed, uint32_t initial_time, uint32_t time);
-
 float trapeziumTarget(float amax, float vmax, float prev_speed, float TS);
-
-int nextIndex(Trajectory trajectory_map, Coordinate current_pos, int index);
-
-float computeAlpha(Coordinate next_pos, Coordinate current_pos);
-
 
 
 /******************* Main Function **************************/
