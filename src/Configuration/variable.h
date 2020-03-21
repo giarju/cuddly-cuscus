@@ -38,7 +38,15 @@ Ticker stick_ticker;
  * diff1       : perbedaan awal dan akhir*/
 uint32_t prof_start1, prof_end1, diff1;
 
+/* variable untuk menyimpan waktu terakhir sampling
+ *
+ * @param lastTimeTangan : sampling tangan 
+ * @param last_time_joystick   : sampling terakhir joystick
+ * @param joysamptime       : sampling time joystick
+ */
 uint32_t lastTimeTangan, last_time_joystick;
+float joysamptime;
+
 
 
 /********************** Pergerakan Base ******************************/

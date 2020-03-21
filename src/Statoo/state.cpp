@@ -143,17 +143,17 @@ void FSM::fsmManual()
     stickArrow();
     if (profil->read_us()-debounceO>50000 && stik->lingkaran && stik->lingkaran!=lastO)
     {
-        armLeft = !armLeft;
+        armLeft = !armLeft;                 /*armRight = 1 naik*/
         debounceO = profil->read_us();
     }
     lastO = stik->lingkaran;
     if (profil->read_us()-debounceKotak>50000 && stik->kotak && stik->kotak!=lastKotak)
     {
-        armLeft = !armLeft;
+        armLeft = !armLeft;                 /*armLeft = 1 naik*/
         debounceKotak = profil->read_us();
     }
     lastKotak = stik->kotak;
-    if (stik->segitiga)
+    if (stik->segitiga && !armLeft && !armRight)
     {
         tembak();
     }

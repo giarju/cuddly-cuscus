@@ -22,16 +22,10 @@
 #define MOTOR_DEBUG
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
-// #define JOYSTICK_DEBUG
+#define JOYSTICK_DEBUG
 #define TRACKING_DEBUG
-#define PENGAMAN_PWM
 
 
-
-int counttt = 0;
-float joysamptime;
-float testy, testprevy = 0.2;
-int speed_state;
 /**************** function declaration ***********************/
 
 
@@ -90,26 +84,12 @@ void writeUart();
 void stickState();
 
 /* 
- * prosedur untuk sampling joystick
- * 
- * */
-void stickSamp();
-
-/* 
- * prosedur untuk kontrol joystick
+ * prosedur untuk test kecepatan trapesium motor
  * 
  * */
 float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_speed, uint32_t initial_time, uint32_t time);
 
 float trapeziumTarget(float amax, float vmax, float prev_speed, float TS);
-
-void speedState();
-
-float max (float a, float b);
-
-float min (float a, float b);
-
-
 
 /******************* Main Function **************************/
 int main ()
@@ -152,13 +132,10 @@ int main ()
         serial_ticker.attach_us(&pcSerialSamp, SERIAL_SAMP);
     #endif 
 
-    #ifdef JOYSTICK_DEBUG
-        /* sampling komunikasi serial */
-        stick_ticker.attach_us(&stickSamp, STICK_SAMP);
-    #endif 
 
     while (1)
     {  
+        #ifdef JOYSTICK_DEBUG
         if (stick.readable()){
             stick.baca_data();
             stick.olah_data();
@@ -169,6 +146,7 @@ int main ()
             // sprintf(str_buffer, "k\n");
             last_time_joystick = profiler.read_us();
         }
+        #endif
             
         // wait(10.0);   
         // prof_start1 = profiler.read_us();
@@ -223,53 +201,11 @@ void encoderMotorSamp()  /* butuh 8 us */
 void motorSamp()
 {
     /* menggerakan motor base */
-    // base_speed.x = 1;
-    // base_speed.y = 1;
-    // base_speed.teta = 1;
-    // if (stick.atas){
-    //     A_pwm = 0.3;
-    //     B_pwm = 0.3;
-    //     C_pwm = 0.3;
-    //     D_pwm = 0.3;
-    // }
-    // else if (stick.bawah){
-    //     A_pwm = -0.3;
-    //     B_pwm = -0.3;
-    //     C_pwm = -0.3;
-    //     D_pwm = -0.3;
-    // }
-
+    A_motor.speed(A_pwm);
+    B_motor.speed(B_pwm);
+    C_motor.speed(C_pwm); 
+    D_motor.speed(D_pwm);
     
-    // if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
-    // {
-    //     A_motor.forcebrake();
-    //     B_motor.forcebrake();
-    //     C_motor.forcebrake(); 
-    //     D_motor.forcebrake();
-    // }
-    // else{      
-        //#ifdef PENGAMAN_PWM
-            float max_pwm = 0.3;
-            // if (fabs(A_pwm) >= max_pwm+0.001){
-            //     A_pwm = max_pwm*fabs(A_pwm)/A_pwm;
-            // }
-            // if (fabs(B_pwm) >= max_pwm+0.001){
-            //     B_pwm = max_pwm*fabs(B_pwm)/B_pwm;
-            // }
-            // if (fabs(C_pwm) >= max_pwm+0.001){
-            //     C_pwm = max_pwm*fabs(C_pwm)/C_pwm;
-            // }
-            // if (fabs(D_pwm) >= max_pwm+0.001){
-            //     D_pwm = max_pwm*fabs(D_pwm)/D_pwm;
-            // }
-            
-        //#endif
-
-        A_motor.speed(A_pwm);
-        B_motor.speed(B_pwm);
-        C_motor.speed(C_pwm); 
-        D_motor.speed(D_pwm);
-    // }
 }
 #endif
 
@@ -280,11 +216,6 @@ void motorSamp()
 #ifdef PID_MOTOR_DEBUG
 void pidMotorSamp()
 {   
-
-    // a_target_speed = trapeziumProfile(-4, 0.004713, a_target_speed, profiler.read_us());
-    // b_target_speed = trapeziumProfile(4, 0.004713, b_target_speed, profiler.read_us());
-    // c_target_speed = trapeziumProfile(4, 0.004713, c_target_speed, profiler.read_us());
-    // d_target_speed = trapeziumProfile(-4, 0.004713, d_target_speed, profiler.read_us());
     
     /* menghitung pid motor base */
     float max_pwm = 0.3;
@@ -432,20 +363,6 @@ float trapeziumTarget(float amax, float vmax, float prev_speed, float TS){
         return vmax;
     }
 }
-
-#ifdef JOYSTICK_DEBUG
-void stickSamp(){
-    // stick.baca_data();
-    // stick.olah_data();
-    // stickState();
-}
-#endif
-
-// void speedState(){
-//     if (speed_state = 0){
-
-//     }
-// }
 
 
 /* state joystick */
@@ -642,12 +559,4 @@ void stickState(){
     }
 
     
-}
-
-float max(float a, float b){
-    return 0.5*(fabs(a)+fabs(b)+fabs(fabs(a)-fabs(b)));
-}
-
-float min(float a, float b){
-    return 0.5*(fabs(a)+fabs(b)-fabs(fabs(a)-fabs(b)));
 }
