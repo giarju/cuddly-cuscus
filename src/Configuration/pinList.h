@@ -95,20 +95,6 @@
 /* Motor D */
 #define PIN_REV_D       PB_3
 
-/* Motor D */
-#define PIN_PWM_ARM_RIGHT       PA_15
-/* Motor D */
-#define PIN_FWD_ARM_RIGHT       PA_14
-/* Motor D */
-#define PIN_REV_ARM_RIGHT       PA_13
-
-/* Motor D */
-#define PIN_PWM_ARM_LEFT       PC_8
-/* Motor D */
-#define PIN_FWD_ARM_LEFT       PC_6
-/* Motor D */
-#define PIN_REV_ARM_LEFT       PC_5
-
 
 
 

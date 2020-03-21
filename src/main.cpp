@@ -23,7 +23,6 @@
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
 #define TRACKING_DEBUG
-<<<<<<< HEAD
 // #define PENGAMAN_PWM
 
 
@@ -34,10 +33,9 @@ float testy, testprevy = 0.2;
 int speed_state;
 float lastThetaRobot = 0;
 float totalThetaRobot = 0;
-=======
+float teta_destination = 0;
 
 
->>>>>>> f7635683e9de5c0a00b7c2eb8ad3744d3cef24d7
 /**************** function declaration ***********************/
 void encoderMotorSamp();
 
@@ -181,8 +179,6 @@ void encoderMotorSamp()  /* butuh 8 us */
     b_motor_speed = (float)B_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
     c_motor_speed = (float)C_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
     d_motor_speed = (float)D_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
-    right_arm_speed = (float)right_arm_enc.getPulses()*360*180/(124.46*ENC_MOTOR_PULSE);
-    //left_arm_speed = (float)left_arm_enc.getPulses()*2*PI/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
 
     
     /* reset nilai encoder */
@@ -200,11 +196,6 @@ void encoderMotorSamp()  /* butuh 8 us */
 #ifdef MOTOR_DEBUG
 void motorSamp()
 {
-    /* menggerakan motor base */
-    A_motor.speed(A_pwm);
-    B_motor.speed(B_pwm);
-    C_motor.speed(C_pwm); 
-    D_motor.speed(D_pwm);
     
 <<<<<<< HEAD
     if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
@@ -254,6 +245,7 @@ void trackingSamp()
     // base_speed = velocityTracker(map[index_traject], Odometry.position); /* index harusnya dari fsm (index bahaya, shared variable sama fsm)*/
     /* menghitung kecepatan masing2 motor base */
     
+    base_speed.teta = thetaFeedback(base_speed.teta,base_position.teta,&lastThetaRobot, &totalThetaRobot, TRACKING_SAMP/1000);
     baseTrapezoidProfile(&base_speed, &base_prev_speed,2, 2, 1, TRACKING_SAMP/1000);
     base4Omni(base_speed, &a_target_speed, &b_target_speed, &c_target_speed, &d_target_speed);
     
@@ -359,9 +351,11 @@ void stickState(){
     /* STICK ROTATION STATE */ 
     if ((stick.R1)){     
         base_speed.teta = -2*PI;
+        theta_destination = base_position.teta;
     } 
     else if ((stick.L1)){
         base_speed.teta = 2*PI;
+        theta_destination = base_position.teta;
     }
 
     statePrint = 1;
@@ -372,6 +366,7 @@ void stickState(){
         base_speed.x = 0;
         base_speed.y = 0;;
         base_speed.teta = 0;
+        theta_destination = base_position.teta;
         statePrint = 0;
         //pc.printf("diam\n");
     } 

@@ -39,6 +39,6 @@ void trapeziodProfile(float *v_now, float *v_last, float t_s_in_ms);
 
 void baseTrapezoidProfile(Coordinate *base, Coordinate *base_last, float ax_max, float ay_max, float alfa_max, float t_s);
 
-float thetaFeedback(float theta_now , float *last_theta, float theta_destination);
+float thetaFeedback(float omega_now ,float theta_now ,float theta_destination, float *last_theta, float *total_theta, float t_s_in_ms);
 
 #endif

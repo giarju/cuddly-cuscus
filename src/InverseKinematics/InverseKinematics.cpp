@@ -61,7 +61,7 @@ void baseTrapezoidProfile(Coordinate *base, Coordinate *base_last, float ax_max,
             time sampling dalam ms
     Output: omega untuk perputaran robot
 */
-float thetaFeedback(int active ,float theta_now , float *last_theta, float *total_theta,float theta_destination, float t_s_in_ms){
+float thetaFeedback(float omega_now ,float theta_now ,float theta_destination, float *last_theta, float *total_theta, float t_s_in_ms){
     float kp = 0;
     float kd = 0;
     float ki = 0;
@@ -69,16 +69,16 @@ float thetaFeedback(int active ,float theta_now , float *last_theta, float *tota
     float om  = 0;
     float theta_bound = 1;
 
-    if (active){
-        om = kp*(theta_destination - theta_now) + (kd*(theta_now - last_theta)/t_s_in_ms) + ki*(*total_theta);
+    if (omega_now == 0){
+        om = kp*(theta_destination - theta_now) + (kd*1000*(theta_now - last_theta)/t_s_in_ms) + ki*(*total_theta);
     }
     else{
-        om = 0;
+        om = omega_now;
     }
 
     *last_theta = theta_now;
     if (fabs(theta_now - theta_destination) < theta_bound && active){
-        *total_theta += (*last_theta + theta_now)*t_s_in_ms/2;  // trapezoid
+        *total_theta += (*last_theta + theta_now)*t_s_in_ms/2000;  // trapezoid
     }
     else{
         *total_theta = 0;
