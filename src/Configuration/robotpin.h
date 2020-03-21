@@ -70,4 +70,6 @@ Motor D_motor(PIN_PWM_D, PIN_FWD_D,PIN_REV_D);
 /* button builtin Nucleo */
 DigitalIn mybutton(USER_BUTTON);
 
+odometriKRAI Odometry(TIMENCX, TIMENCY, CMPS_SDA, CMPS_SCL);
+
 #endif

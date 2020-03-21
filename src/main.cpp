@@ -14,14 +14,27 @@
 
 /******************** Aktivasi Debug ************************/
 
-// #define ODOMETRY_DEBUG 
+#define ODOMETRY_DEBUG 
 #define SERIAL_DEBUG 
 #define MOTOR_DEBUG
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
 #define TRACKING_DEBUG
+<<<<<<< HEAD
+// #define PENGAMAN_PWM
 
 
+
+int counttt = 0;
+float joysamptime;
+float testy, testprevy = 0.2;
+int speed_state;
+float lastThetaRobot = 0;
+float totalThetaRobot = 0;
+=======
+
+
+>>>>>>> f7635683e9de5c0a00b7c2eb8ad3744d3cef24d7
 /**************** function declaration ***********************/
 void encoderMotorSamp();
 
@@ -83,6 +96,7 @@ int main ()
     profiler.start(); 
     stick.setup();
     stick.idle();
+    Odometry.resetOdom();
 
 
     /* inisialisasi sampling untuk setiap proses dengan callback*/
@@ -183,6 +197,23 @@ void motorSamp()
     C_motor.speed(C_pwm); 
     D_motor.speed(D_pwm);
     
+<<<<<<< HEAD
+    if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
+    {
+        A_motor.forcebrake();
+        B_motor.forcebrake();
+        C_motor.forcebrake(); 
+        D_motor.forcebrake();
+    }
+    else{      
+
+        A_motor.speed(A_pwm);
+        B_motor.speed(B_pwm);
+        C_motor.speed(C_pwm); 
+        D_motor.speed(D_pwm);
+    }
+=======
+>>>>>>> f7635683e9de5c0a00b7c2eb8ad3744d3cef24d7
 }
 #endif
 
@@ -195,19 +226,11 @@ void pidMotorSamp()
 {   
     
     /* menghitung pid motor base */
-    float max_pwm = 0.3;
-    A_pwm = A_pid_motor.createpwm(a_target_speed, a_motor_speed, 1);
-    B_pwm = B_pid_motor.createpwm(b_target_speed, b_motor_speed, 1);
-    C_pwm = C_pid_motor.createpwm(c_target_speed, c_motor_speed, 1);
-    D_pwm = D_pid_motor.createpwm(d_target_speed, d_motor_speed, 1);
-
-    A_pwm = fabs(A_pwm) >= max_pwm ? fabs(A_pwm)*max_pwm/A_pwm : A_pwm;
-    B_pwm = fabs(B_pwm) >= max_pwm ? fabs(B_pwm)*max_pwm/B_pwm : B_pwm;
-    C_pwm = fabs(C_pwm) >= max_pwm ? fabs(C_pwm)*max_pwm/C_pwm : C_pwm;
-    D_pwm = fabs(D_pwm) >= max_pwm ? fabs(D_pwm)*max_pwm/D_pwm : D_pwm;
-    
-
-    
+    float max_pwm = 1;
+    A_pwm = A_pid_motor.createpwm(a_target_speed, a_motor_speed, max_pwm);
+    B_pwm = B_pid_motor.createpwm(b_target_speed, b_motor_speed, max_pwm);
+    C_pwm = C_pid_motor.createpwm(c_target_speed, c_motor_speed, max_pwm);
+    D_pwm = D_pid_motor.createpwm(d_target_speed, d_motor_speed, max_pwm);   
 }
 #endif
  
@@ -221,6 +244,7 @@ void trackingSamp()
     /* menghitung kecepatan robot berdasarkan map dan posisi aktual*/
     // base_speed = velocityTracker(map[index_traject], Odometry.position); /* index harusnya dari fsm (index bahaya, shared variable sama fsm)*/
     /* menghitung kecepatan masing2 motor base */
+    
     baseTrapezoidProfile(&base_speed, &base_prev_speed,2, 2, 1, TRACKING_SAMP/1000);
     base4Omni(base_speed, &a_target_speed, &b_target_speed, &c_target_speed, &d_target_speed);
     
@@ -288,59 +312,20 @@ void writeUart() /* butuh 4 us */
     CriticalSectionLock::disable();
 }
     
-float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_speed, uint32_t initial_time, uint32_t time){
-    // if (time < 500000){
-    //     return prev_speed + amax*TS;
-    // }
-    // else if ((500000 <= time) && (time < 4000000)){
-    //     return prev_speed;
-    // }
-    // else if ((4000000 <= time) && (time < 4500000)){
-    //     return prev_speed - amax*TS;
-    // }
-    // else {
-    //     return 0;
-    // }
-    volatile float T1 = vmax/amax;
-    volatile float T2 = T1 + (smax - amax*T1*T1)/vmax;
-    volatile float T3 = T2 + T1;
 
-    if ((time - initial_time) < T1){
-        if (prev_speed + amax*TS > vmax){
-            return vmax;
-        }
-        else{
-            return prev_speed + amax*TS;
-        }
-    }
-    else if ((T1 <= (time - initial_time)) && ((time - initial_time) < T2)){
-        return vmax;
-    }
-    else if ((T2 <= (time - initial_time)) && ((time - initial_time) < T3)){
-        if (prev_speed - amax*TS < 0){
-            return 0;
-        }
-        else{
-            return prev_speed - amax*TS;
-        }     
-    }
-    else {
-        return 0;
-    }
+
+<<<<<<< HEAD
+#ifdef JOYSTICK_DEBUG
+void stickSamp(){
+    // stick.baca_data();
+    // stick.olah_data();
+    // stickState();
 }
+#endif
 
-float trapeziumTarget(float amax, float vmax, float prev_speed, float TS){
-    if(prev_speed < vmax && amax > 0){
-        return prev_speed + amax*TS;
-    }
-    else if(prev_speed > vmax && amax < 0){
-        return prev_speed + amax*TS;
-    }
-    else {
-        return vmax;
-    }
-}
 
+=======
+>>>>>>> f7635683e9de5c0a00b7c2eb8ad3744d3cef24d7
 
 /* state joystick */
 void stickState(){

@@ -23,6 +23,23 @@
 #define PIN_TEMBAK      PH_1
 
 
+
+/*********Encoder Eksternal*********/
+
+#define TIMENCX TIM2
+
+#define TIMENCY TIM3
+
+//Encoder 1
+#define PIN_1_CHA       PB_8 // TIM 2
+#define PIN_1_CHB       PB_9
+//Encoder 2
+#define PIN_2_CHA       PB_4 //TIM 3
+#define PIN_2_CHB       PB_5
+//Encoder 3
+#define PIN_3_CHA       PB_6 // TIM 4
+#define PIN_3_CHB       PB_7
+
 /************ Encoder motor ************/
 /* Encoder Motor Base */
 
@@ -46,15 +63,6 @@
 /* Encoder D */
 #define PIN_D_CHB       PC_10
 
-/* Encoder arm kanan */
-#define PIN_ARM_RIGHT_CHA       PB_7
-/* Encoder arm kanan */
-#define PIN_ARM_RIGHT_CHB       PB_6
-
-/* Encoder arm kiri */
-#define PIN_ARM_LEFT_CHA       PB_2
-/* Encoder arm_kiri */
-#define PIN_ARM_LEFT_CHB       PD_2
 
 /************ pwm motor ************/
 
