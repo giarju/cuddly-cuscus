@@ -158,13 +158,8 @@ int main ()
         // prof_end1 = profiler.read_us();
         // diff1 = prof_end1 - prof_start1;
         // pc.printf("");  
-<<<<<<< HEAD
     }     
 }
-=======
-    }
-}     
->>>>>>> fbeba902ab750faeaabedaa4600cee514e07c585
 
 #ifdef ODOMETRY_DEBUG
 void odometrySamp (){    /*butuh 48018 us */  
@@ -201,7 +196,6 @@ void encoderMotorSamp()  /* butuh 8 us */
 #ifdef MOTOR_DEBUG
 void motorSamp()
 {
-<<<<<<< HEAD
     if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
     {
         A_motor.forcebrake();
@@ -217,8 +211,6 @@ void motorSamp()
         D_motor.speed(D_pwm);
     }
 
-=======
->>>>>>> fbeba902ab750faeaabedaa4600cee514e07c585
     /* menggerakan motor base */
     A_motor.speed(A_pwm);
     B_motor.speed(B_pwm);
@@ -255,11 +247,7 @@ void trackingSamp()
     // base_speed = velocityTracker(map[index_traject], Odometry.position); /* index harusnya dari fsm (index bahaya, shared variable sama fsm)*/
     /* menghitung kecepatan masing2 motor base */
     
-<<<<<<< HEAD
     base_speed.teta = thetaFeedback(base_speed.teta,Odometry.position.teta,theta_destination,&lastThetaRobot, &totalThetaRobot, TRACKING_SAMP/1000);
-=======
-    // base_speed.teta = thetaFeedback(base_speed.teta,Odometry.position.teta,&lastThetaRobot, &totalThetaRobot, TRACKING_SAMP/1000);
->>>>>>> fbeba902ab750faeaabedaa4600cee514e07c585
     baseTrapezoidProfile(&base_speed, &base_prev_speed,2, 2, 1, TRACKING_SAMP/1000);
     base4Omni(base_speed, &a_target_speed, &b_target_speed, &c_target_speed, &d_target_speed);
     
@@ -430,11 +418,7 @@ void stickState(){
         base_speed.teta = 0;
         //pc.printf("atas\n");
     } 
-<<<<<<< HEAD
     
-=======
-     
->>>>>>> fbeba902ab750faeaabedaa4600cee514e07c585
 }
 
 // void gerakAuto(){
