@@ -36,3 +36,15 @@ Trajectory getNextPoint (int index, Trajectory *path)
 {
    return (*(path+index+1));
 }
+
+Trajectory setTrajectory(Coordinate velocity, Coordinate distance){
+   Trajectory Track;
+   Track.velocity.x = velocity.x;
+   Track.velocity.y = velocity.y;
+   Track.velocity.teta = velocity.teta;
+   Track.distance.x = distance.x;
+   Track.distance.y = distance.y;
+   Track.distance.teta = distance.teta;
+
+   return Track;
+}
