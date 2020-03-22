@@ -71,18 +71,18 @@ int index_curr_pos;
 int index_next_pos;
 
 /* Map trajectory, berisi nilai vx,vy,omega*/
-Coordinate velocity[3] ={
-        {0, 3, 3, 3, 0},
-        {0, 3, 3, 3, 0},
-        {0, 0, 0, 0, 0},
-};
+// Coordinate velocity[3] ={
+//         {0, 3, 3, 3, 0},
+//         {0, 3, 3, 3, 0},
+//         {0, 0, 0, 0, 0},
+// }
 
 /* Map trajectory, berisi nilai jarak x,jarak y, selisih theta */
-Coordinate distance[3]={
-        {0,  0,   100, 100},
-        {0,  100, 100, 0},
-        {0,  0,   0,   0},
-}
+// Coordinate distance[3]={
+//         {0,  0,   100, 100},
+//         {0,  100, 100, 0},
+//         {0,  0,   0,   0},
+// }
 
 
 /* kecapatan base, berisi nilai vx,vy,omega*/

@@ -11,6 +11,7 @@
 #include "Configuration/constant.h"
 #include "Configuration/variable.h"
 #include "Configuration/robotpin.h"
+#include "InverseKinematics/InverseKinematics.h"
 
 /******************** Aktivasi Debug ************************/
 
@@ -81,6 +82,8 @@ void stickState();
 float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_speed, uint32_t initial_time, uint32_t time);
 float trapeziumTarget(float amax, float vmax, float prev_speed, float TS);
 
+void odometrySamp();
+
 
 /******************* Main Function **************************/
 int main ()
@@ -144,11 +147,12 @@ int main ()
         // prof_start1 = profiler.read_us();
         // prof_end1 = profiler.read_us();
         // diff1 = prof_end1 - prof_start1;
-        // pc.printf("");       
+        // pc.printf("");  
+    }     
+}
 
 #ifdef ODOMETRY_DEBUG
-void odometrySamp ()  /*butuh 48018 us */  
-{  
+void odometrySamp (){    /*butuh 48018 us */  
     /* update posisi robot berdasarkan odometri */
     Odometry.updatePosition();                                     
 }
@@ -182,9 +186,6 @@ void encoderMotorSamp()  /* butuh 8 us */
 #ifdef MOTOR_DEBUG
 void motorSamp()
 {
-<<<<<<< HEAD
-    
-<<<<<<< HEAD
     if (base_speed.x == 0 && base_speed.y == 0 && base_speed.teta == 0)
     {
         A_motor.forcebrake();
@@ -199,15 +200,12 @@ void motorSamp()
         C_motor.speed(C_pwm); 
         D_motor.speed(D_pwm);
     }
-=======
->>>>>>> f7635683e9de5c0a00b7c2eb8ad3744d3cef24d7
-=======
+
     /* menggerakan motor base */
     A_motor.speed(A_pwm);
     B_motor.speed(B_pwm);
     C_motor.speed(C_pwm); 
     D_motor.speed(D_pwm);
->>>>>>> 8b1b467204a3d6ee7d4fd157ed5e70af96e57089
 }
 #endif
 
@@ -239,7 +237,7 @@ void trackingSamp()
     // base_speed = velocityTracker(map[index_traject], Odometry.position); /* index harusnya dari fsm (index bahaya, shared variable sama fsm)*/
     /* menghitung kecepatan masing2 motor base */
     
-    base_speed.teta = thetaFeedback(base_speed.teta,Odometry.position.teta,&lastThetaRobot, &totalThetaRobot, TRACKING_SAMP/1000);
+    base_speed.teta = thetaFeedback(base_speed.teta,Odometry.position.teta,theta_destination,&lastThetaRobot, &totalThetaRobot, TRACKING_SAMP/1000);
     baseTrapezoidProfile(&base_speed, &base_prev_speed,2, 2, 1, TRACKING_SAMP/1000);
     base4Omni(base_speed, &a_target_speed, &b_target_speed, &c_target_speed, &d_target_speed);
     
@@ -410,15 +408,15 @@ void stickState(){
         base_speed.teta = 0;
         //pc.printf("atas\n");
     } 
-    } 
+    
 }
 
-void gerakAuto(){
-    index_curr_pos = 0;
-    index_next_pos = nextIndex(distance[index_curr_pos+1], Odometry.position, index_curr_pos); // baca indeks berikutnya
-    v_resultan = vwGenerator(distance[index_next_pos],Odometry.position, distance[index_curr_pos-1], float accel, float decel, float saturation); //cari kecepatan target,input accel, decel, saturation
-    alpha= computeAlpha(distance[index_next_pos], Odometry.position); // 
-    velocity.x = v_resultan*cos(alpha);
-    velocity.y = v_resultan*sin(alpha);
-    velocity.theta = v_resultan;
-}
+// void gerakAuto(){
+//     index_curr_pos = 0;
+//     index_next_pos = nextIndex(distance[index_curr_pos+1], Odometry.position, index_curr_pos); // baca indeks berikutnya
+//     v_resultan = vwGenerator(distance[index_next_pos],Odometry.position, distance[index_curr_pos-1], float accel, float decel, float saturation); //cari kecepatan target,input accel, decel, saturation
+//     alpha= computeAlpha(distance[index_next_pos], Odometry.position); // 
+//     velocity.x = v_resultan*cos(alpha);
+//     velocity.y = v_resultan*sin(alpha);
+//     velocity.theta = v_resultan;
+// }
