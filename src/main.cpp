@@ -77,10 +77,6 @@ float pwm1,pwm2;
 /* variable penyimpan waktu */
 uint32_t last_baca, last_pid, last_motor;
 
-void PID_kiri_naik(float setpoint);
-void PID_kiri_turun(float setpoint);
-void PID_kanan_naik(float setpoint);
-void PID_kanan_turun(float setpoint);
 void tangankanan(float target,float feedback);
 void tangankiri(float target,float feedback);
 
@@ -96,98 +92,46 @@ int main() {
     
         /* command move motor and sample data*/ 
         while(1)
-        {           
-            if(kiri==1){
-                PID_kiri_naik(150);
+        {      
+            if (timer1.read_us()-samp >= 7123){
+                curr_theta2 += (float)enc_arm1.getPulses()*360/538;
+                curr_theta1 += (float)enc_arm1.getPulses()*360/538;
+
+                enc_arm1.reset();
+                        
+                samp = timer1.read_us(); 
                 }
-            if(kiri==0){
-                PID_kiri_turun(0);
+                
+            if (timer1.read_us() - samp_pid > 9127){   
+                if(kiri==1 && kanan==0){
+                    tangankiri(150,curr_theta2);
+                    }
+                if(kiri==0 && kanan==1){
+                    tangankiri(0,curr_theta2);
+                    }
+                if(kanan==1 && kiri==0){
+                    tangankanan(110,curr_theta1);
+                    }
+                if(kanan==0 && kiri==1){
+                    tangankanan(10,curr_theta1);
+                    }  
+                samp_pid = timer1.read_us();     
                 }
-            if(kanan==1){
-                PID_kanan_naik(110);
-                }
-            if(kanan==0){
-                PID_kanan_turun(10);
-                }            
+                  
+            if(timer1.read_us() - last_baca > 100000){
+                if (curr_theta2>=10 && curr_theta1<=10){
+                    pc.printf("%.2f %.2f\n", curr_theta2, pwm2);
+                    }
+                if (curr_theta1>=10 && curr_theta2<=10){
+                    pc.printf("%.2f %.2f\n", curr_theta1, pwm1);
+                    }                
+                }         
         }
     }
-         /* turn off motor after sampling done */ 
     /* ================================================================== */
 
-
-void PID_kiri_naik(float setpoint){
-    if (timer1.read_us()-samp >= 7123){
-        curr_theta2 += (float)enc_arm1.getPulses()*360/538;
-        enc_arm1.reset();
-                
-        samp = timer1.read_us(); 
-        }
-        
-    if (timer1.read_us() - samp_pid > 9127){
-        tangankiri(setpoint,curr_theta2);
-        samp_pid = timer1.read_us();     
-        }   
-        
-    if(timer1.read_us() - last_baca > 100000){
-        pc.printf("%.2f %.2f\n", curr_theta2, pwm2);
-        }
-    }
-
-void PID_kiri_turun(float setpoint){
-    if (timer1.read_us()-samp >= 7123){
-        curr_theta2 += (float)enc_arm1.getPulses()*360/538;
-        enc_arm1.reset();
-                
-        samp = timer1.read_us(); 
-        }
-        
-    if (timer1.read_us() - samp_pid > 9127){
-        tangankiri(setpoint,curr_theta2);
-        samp_pid = timer1.read_us();     
-        }   
-        
-    if(timer1.read_us() - last_baca > 100000){
-        pc.printf("%.2f %.2f\n", curr_theta2, pwm2);
-        }
-    }
-
-void PID_kanan_naik(float setpoint){
-    if (timer1.read_us()-samp >= 7123){
-        curr_theta1 += (float)enc_arm1.getPulses()*360/538;
-        enc_arm1.reset();
-        
-        samp = timer1.read_us(); 
-        } 
-    
-    if (timer1.read_us() - samp_pid > 9127){
-        tangankanan(setpoint,curr_theta1);
-        samp_pid = timer1.read_us();    
-        }  
-     
-    if(timer1.read_us() - last_baca > 100000){
-        pc.printf("%.2f %.2f\n", curr_theta1, pwm1);
-        }
-    }
-
-void PID_kanan_turun(float setpoint){
-    if (timer1.read_us()-samp >= 7123){
-        curr_theta1 += (float)enc_arm1.getPulses()*360/538;
-        enc_arm1.reset();
-        
-        samp = timer1.read_us(); 
-        } 
-    
-    if (timer1.read_us() - samp_pid > 9127){
-        tangankanan(setpoint,curr_theta1);
-        samp_pid = timer1.read_us();    
-        }  
-     
-    if(timer1.read_us() - last_baca > 100000){
-        pc.printf("%.2f %.2f\n", curr_theta1, pwm1);
-        }
-    } 
-                      
-/* definisi fungsi */
+                     
+/* fungsi untuk menggerakan tangan kanan */
 void tangankanan(float target,float feedback){
     float error = target - feedback;
 
@@ -230,6 +174,7 @@ void tangankanan(float target,float feedback){
     }
 }
 
+/* fungsi untuk menggerakan tangan kiri */
 void tangankiri(float target,float feedback){
     float error = target - feedback;
 
