@@ -37,6 +37,24 @@ Trajectory getNextPoint (int index, Trajectory *path)
    return (*(path+index+1));
 }
 
+//Get velocity and distance at current point
+Trajectory_vr getPoint (int index, Trajectory_vr *path)
+{
+   return (*(path+index));
+}
+
+//Get velocity and distance at prev point
+Trajectory_vr getPrevPoint (int index, Trajectory_vr *path)
+{
+   return (*(path+index-1));
+}
+
+//Get velocity and distance at next point
+Trajectory_vr getNextPoint (int index, Trajectory_vr *path)
+{
+   return (*(path+index+1));
+}
+
 Trajectory setTrajectory(Coordinate velocity, Coordinate distance){
    Trajectory Track;
    Track.velocity.x = velocity.x;

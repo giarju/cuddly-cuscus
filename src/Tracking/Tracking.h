@@ -24,41 +24,10 @@
 #define R_ACCEPTANCE 1  
 
 /*kecepatan maksimal base, satuan dalam m/s*/
-#define BASE_SATURATE 10
-
-/*konstanta pid untuk vx*/
-#define KP_X_BASE 3
-#define KI_X_BASE 0
-#define KD_X_BASE 0
-#define N_X_BASE 0
-#define TS_X_BASE 0.3173
-#define FF_X_BASE 1
-
-/*konstanta pid untuk vy*/
-#define KP_Y_BASE 3
-#define KI_Y_BASE 0
-#define KD_Y_BASE 0
-#define N_Y_BASE 0
-#define TS_Y_BASE 0.3173
-#define FF_Y_BASE 1
-
-/*konstanta pid untuk omega*/
-#define KP_TETA_BASE 3
-#define KI_TETA_BASE 0
-#define KD_TETA_BASE 0
-#define N_TETA_BASE 0
-#define TS_TETA_BASE 0.3173
-#define FF_TETA_BASE 1
+#define BASE_SATURATE 1
 
 
 /************************* deklarasi variable ***********************************/
-
-
-/* deklarasi pid untuk base */
-// PID pid_x_base(KP_X_BASE, KI_X_BASE, KD_X_BASE, N_X_BASE, TS_X_BASE, FF_X_BASE, PID::Mode::PI_MODE);
-// PID pid_y_base(KP_Y_BASE, KI_Y_BASE, KD_Y_BASE, N_Y_BASE, TS_Y_BASE, FF_Y_BASE, PID::Mode::PI_MODE);
-// PID pid_teta_base(KP_TETA_BASE, KI_TETA_BASE, KD_TETA_BASE, N_TETA_BASE, TS_TETA_BASE, FF_TETA_BASE, PID::Mode::PI_MODE);
-
 
 /************************* deklarasi fungsi  ***********************************/
 
@@ -72,21 +41,27 @@
 int nextIndex(Trajectory trajectory_map, Coordinate current_pos, int index);
 
 /*
- * Menghitung kecepatan target robot berdasarkan posisi robot saat ini dan 
- * kecepatan dan posisi robot pada titik selanjutnya (implementasi dengan pid)
- * 
- * @param next_point : titik target yang dituju oleh robot
- * @param current_pos : titik koordinat robot saat ini 
- */
-Coordinate velocityTracker(Coordinate next_point, Coordinate  current_pos);
-
-/*
  * Menghitung arah gerak robot berdasarkan posisi robot dan target
  * 
  * @param next_point : titik target yang dituju oleh robot
  * @param current_pos : titik koordinat robot saat ini 
  */
 float computeAlpha(Coordinate next_pos, Coordinate current_pos);
+
+void findClosestIntersection(Trajectory_vr* map, Coordinate current_pos, int map_size, int prev_closest, float pursuit_radius, int* closest_point, int* target_point, int* is_intersect);
+
+Trajectory_vr getLinearIntpPoint(Trajectory_vr* map, Coordinate current_pos, int is_intersect, int target_point, float pursuit_radius);
+
+
+/*
+ * Menghitung kecepatan target robot berdasarkan posisi robot saat ini dan 
+ * kecepatan dan posisi robot pada titik selanjutnya (implementasi dengan pid)
+ * 
+ * @param next_point : titik target yang dituju oleh robot
+ * @param current_pos : titik koordinat robot saat ini 
+ */
+void velocityTracker(Trajectory_vr* map, Coordinate current_pos, int map_size, float pursuit_radius, Coordinate* velocity, int* closest_point, int* target_point);
+
 
 /*
  * Menghitung kecepatan target robot berdasarkan posisi robot saat ini dan 

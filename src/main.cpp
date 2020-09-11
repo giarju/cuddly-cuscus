@@ -5,22 +5,28 @@
  * 
  ***************************************************************************/
 
-/********************** Library ******************************/
-
-#include "mbed.h"
-#include "Configuration/constant.h"
-#include "Configuration/variable.h"
-#include "Configuration/robotpin.h"
-
 /******************** Aktivasi Debug ************************/
 
-#define ODOMETRY_DEBUG 
+// #define ODOMETRY_DEBUG 
 #define SERIAL_DEBUG 
 #define MOTOR_DEBUG
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
 #define TRACKING_DEBUG
+// #define JOYSTICK_DEBUG
 // #define PENGAMAN_PWM
+#define SIMUL_DEBUG
+
+/********************** Library ******************************/
+ 
+#include "mbed.h"
+#include "Configuration/constant.h"
+#include "Configuration/variable.h"
+#include "Configuration/robotpin.h"
+#include "Configuration/map.h"
+#include "RobotModelKRAI/MotorModel.h"
+#include "RobotModelKRAI/EncModel.h"
+#include "RobotModelKRAI/RobotModel.h"
 
 
 
@@ -88,24 +94,46 @@ void stickState();
  * prosedur untuk test kecepatan trapesium motor
  * 
  * */
+void mapState();
 float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_speed, uint32_t initial_time, uint32_t time);
 float trapeziumTarget(float amax, float vmax, float prev_speed, float TS);
 
+void simul_samp();
+int simulcnt = 0;
+float simulspeed,simv2;
+float simv;
+float simv3;
+int curr_clst_point; int tp;
 
+double k1 = 1, k2 = -1.99861880768107, k3 = 0.998618807681070, k4 = 4.55434472841233e-07, k5 = 4.55243089052985e-07, k6 = 9.28554056001574e-17;
+MotorModel motor_sim1(k1, k2, k3, k4, k5, k6, 24);
+int t_pulse = 538; float wrad = 0.1;
+EncModel enc_sim1(t_pulse, wrad);
+RobotModel robot_sim1(RobotModel::OMNI_4);
+Trajectory_vr next_point;
+int target_point;
+int is_intersect;
+float alphass;
+float cos_alpha;
+float vr_sim;
+int map_state = 0;
+int map_check;
+uint32_t button_debounce;
 /******************* Main Function **************************/
 int main ()
 {
     /* initial setup */
+    robot_sim1.createRobot();
     // Odometry.resetOdom();   
     profiler.start(); 
-    stick.setup();
-    stick.idle();
-    Odometry.resetOdom();
-
+    // stick.setup();
+    // stick.idle();
+    
 
     /* inisialisasi sampling untuk setiap proses dengan callback*/
     #ifdef ODOMETRY_DEBUG
         /* sampling odometri base */
+        Odometry.resetOdom();
         odometry_ticker.attach_us(&odometrySamp, ODOMETRY_SAMP);
     #endif
 
@@ -134,9 +162,15 @@ int main ()
         serial_ticker.attach_us(&pcSerialSamp, SERIAL_SAMP);
     #endif 
 
+    #ifdef SIMUL_DEBUG
+        /* sampling komunikasi serial */
+        simul_ticker.attach_us(&simul_samp, 1000);
+    #endif 
+
 
     while (1)
     {  
+        
         #ifdef JOYSTICK_DEBUG
         if (stick.readable()){
             stick.baca_data();
@@ -162,7 +196,40 @@ int main ()
 void odometrySamp ()  /*butuh 48018 us */  
 {  
     /* update posisi robot berdasarkan odometri */
-    Odometry.updatePosition();                                     
+    // Odometry.updatePosition();    
+
+}
+#endif
+
+ 
+/* 
+ * prosedur untuk melakukan tracking path
+ * 
+ * */
+#ifdef TRACKING_DEBUG
+void trackingSamp()
+{
+
+    /* menghitung kecepatan robot berdasarkan map dan posisi aktual*/
+    // velocityTracker(mapvr, robot_sim1.Odometry_position, PURSUIT_RADIUS_BASE, &base_speed, &curr_clst_point, &tp); 
+    mapState();
+    map_check = map_size[map_state];
+    findClosestIntersection(map_pointer[map_state], robot_sim1.Odometry_position, map_size[map_state], curr_clst_point, PURSUIT_RADIUS_BASE,  &curr_clst_point, &tp, &is_intersect);
+    next_point =  getLinearIntpPoint(map_pointer[map_state], robot_sim1.Odometry_position,is_intersect, tp, PURSUIT_RADIUS_BASE);
+    alphass = computeAlpha(next_point.distance,robot_sim1.Odometry_position);
+
+    base_speed.x= next_point.vr*cos(alphass);
+    base_speed.y = next_point.vr*sin(alphass);
+    base_speed.teta = next_point.distance.teta;
+    /* menghitung kecepatan masing2 motor base */
+    
+    // base_speed.teta = thetaFeedback(base_speed.teta,Odometry.position.teta,&lastThetaRobot, &totalThetaRobot, TRACKING_SAMP/1000);
+    // baseTrapezoidProfile(&base_speed, &base_prev_speed,2, 2, 1, TRACKING_SAMP/1000);
+    base4Omni(base_speed, &a_target_speed, &b_target_speed, &c_target_speed, &d_target_speed);
+    
+    base_prev_speed.x = base_speed.x;
+    base_prev_speed.y = base_speed.y;
+    base_prev_speed.teta = base_speed.teta;
 }
 #endif
 
@@ -173,32 +240,22 @@ void odometrySamp ()  /*butuh 48018 us */
 #ifdef ENCMOTOR_DEBUG
 void encoderMotorSamp()  /* butuh 8 us */
 {
-    /* ukur kecepatan motor base dalam m/s */
-    a_motor_speed = (float)A_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
-    b_motor_speed = (float)B_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
-    c_motor_speed = (float)C_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
-    d_motor_speed = (float)D_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    // /* ukur kecepatan motor base dalam m/s */
+    // a_motor_speed = (float)A_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    // b_motor_speed = (float)B_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    // c_motor_speed = (float)C_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    // d_motor_speed = (float)D_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
 
-    /* reset nilai encoder */
-    A_enc.reset();
-    B_enc.reset();
-    C_enc.reset();
-    D_enc.reset();
-}
-#endif
+    // /* reset nilai encoder */
+    // A_enc.reset();
+    // B_enc.reset();
+    // C_enc.reset();
+    // D_enc.reset();
 
-/* 
- * prosedur untuk melakukan sampling pwm motor base
- * 
- * */
-#ifdef MOTOR_DEBUG
-void motorSamp()
-{
-    /* menggerakan motor base */
-    A_motor.speed(A_pwm);
-    B_motor.speed(B_pwm);
-    C_motor.speed(C_pwm); 
-    D_motor.speed(D_pwm);
+    a_motor_speed = robot_sim1.encA.pulsesOmega()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    b_motor_speed = robot_sim1.encB.pulsesOmega()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    c_motor_speed = robot_sim1.encC.pulsesOmega()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
+    d_motor_speed = robot_sim1.encD.pulsesOmega()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
 }
 #endif
 
@@ -218,27 +275,30 @@ void pidMotorSamp()
     D_pwm = D_pid_motor.createpwm(d_target_speed, d_motor_speed, max_pwm);   
 }
 #endif
- 
+
 /* 
- * prosedur untuk melakukan tracking path
+ * prosedur untuk melakukan sampling pwm motor base
  * 
  * */
-#ifdef TRACKING_DEBUG
-void trackingSamp()
+#ifdef MOTOR_DEBUG
+void motorSamp()
 {
-    /* menghitung kecepatan robot berdasarkan map dan posisi aktual*/
-    // base_speed = velocityTracker(map[index_traject], Odometry.position); /* index harusnya dari fsm (index bahaya, shared variable sama fsm)*/
-    /* menghitung kecepatan masing2 motor base */
-    
-    // base_speed.teta = thetaFeedback(base_speed.teta,Odometry.position.teta,&lastThetaRobot, &totalThetaRobot, TRACKING_SAMP/1000);
-    baseTrapezoidProfile(&base_speed, &base_prev_speed,2, 2, 1, TRACKING_SAMP/1000);
-    base4Omni(base_speed, &a_target_speed, &b_target_speed, &c_target_speed, &d_target_speed);
-    
-    base_prev_speed.x = base_speed.x;
-    base_prev_speed.y = base_speed.y;
-    base_prev_speed.teta = base_speed.teta;
+    /* menggerakan motor base */
+    // A_motor.speed(A_pwm);
+    // B_motor.speed(B_pwm);
+    // C_motor.speed(C_pwm); 
+    // D_motor.speed(D_pwm);
+
+    float pwm_test = 1.0;
+
+    robot_sim1.motor1.motorSim(A_pwm);
+    robot_sim1.motor2.motorSim(B_pwm);
+    robot_sim1.motor3.motorSim(C_pwm);
+    robot_sim1.motor4.motorSim(D_pwm);
+
 }
 #endif
+
 
 /* 
  * prosedur untuk print string dengan uart setiap sampling time
@@ -247,7 +307,7 @@ void trackingSamp()
 void pcSerialSamp() /*1200 us untuk 16 karakter pc.printf*/ /* 20 us dgn attach*/
 {
     /* write string ke buffer 1 (str_buffer) */     
-    sprintf(str_buffer, "%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f\n",  a_motor_speed, b_motor_speed, c_motor_speed, d_motor_speed, A_pwm, B_pwm, C_pwm, D_pwm);
+    sprintf(str_buffer, "%.2f\n", 67.8);
     // sprintf(str_buffer, "%.2f\n",  a_target_speed);
     /* mengirimkan string melalui uart */
     sendUart(str_buffer);      
@@ -298,7 +358,7 @@ void writeUart() /* butuh 4 us */
     CriticalSectionLock::disable();
 }
     
-
+#ifdef JOYSTICK_DEBUG
 /* state joystick */
 void stickState(){
 //Procedure to read command from stick and take action
@@ -403,13 +463,28 @@ void stickState(){
     } 
      
 }
+#endif
 
-// void gerakAuto(){
-//     index_curr_pos = 0;
-//     index_next_pos = nextIndex(distance[index_curr_pos+1], Odometry.position, index_curr_pos); // baca indeks berikutnya
-//     v_resultan = vwGenerator(distance[index_next_pos],Odometry.position, distance[index_curr_pos-1], float accel, float decel, float saturation); //cari kecepatan target,input accel, decel, saturation
-//     alpha= computeAlpha(distance[index_next_pos], Odometry.position); // 
-//     velocity.x = v_resultan*cos(alpha);
-//     velocity.y = v_resultan*sin(alpha);
-//     velocity.theta = v_resultan;
-// }
+
+void mapState()
+{
+    /* next map */
+    if (!mybutton && profiler.read_us() - button_debounce > 500000)
+    {
+        map_state++;
+        curr_clst_point = 0;
+        button_debounce = profiler.read_us();
+    }
+    /* prev map*/
+    // else if(){}
+}
+
+#ifdef SIMUL_DEBUG
+void simul_samp()
+{
+    robot_sim1.omni4WheelModel();
+    simv = robot_sim1.y_robot;
+    simv2 = robot_sim1.x_robot;
+    simv3 = robot_sim1.h_robot;
+}
+#endif

@@ -32,6 +32,8 @@ Ticker pid_motor_ticker;
 
 Ticker stick_ticker;
 
+Ticker simul_ticker;
+
 /* variable untuk menyimpan waktu 
  * prof_start1 : menyimpan waktu awal 
  * prof_end1   : menyimpan waktu akhir
@@ -88,6 +90,14 @@ Coordinate map_dist[5]={
         {0      ,0      ,0},
 };
 
+Trajectory maphhh[5]={
+        //velocity              distance
+        {0.00      ,0.00      ,0.00      ,0.00      ,0.00      ,0.00},
+        {0.01      ,0.01      ,0.01      ,0.20      ,0.20      ,0.20},
+        {0.02      ,0.02      ,0.02      ,0.40      ,0.40      ,0.40},
+        {0.01      ,0.01      ,0.01      ,0.60      ,0.60      ,0.60},
+        {0.00      ,0.00      ,0.00      ,0.80      ,0.80      ,0.80},
+};
 
 /* kecapatan base, berisi nilai vx,vy,omega*/
 Coordinate base_speed;

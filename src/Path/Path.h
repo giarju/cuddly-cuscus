@@ -31,6 +31,12 @@ typedef struct Trajectory_t
    Coordinate distance;
 }Trajectory;
 
+typedef struct Trajectory_vr_t
+{
+   Coordinate distance;
+   float vr;
+}Trajectory_vr;
+
 /*mencari posisi saat ini*/
 Trajectory setTrajectory(Coordinate velocity, Coordinate distance);
 

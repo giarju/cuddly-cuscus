@@ -10,6 +10,7 @@
 #define  RAD_TO_DEG                             57.295779
 #define  WHEEL_RAD                              0.075
 #define  wheel_distance_from_center             0.180
+#define  PURSUIT_RADIUS_BASE                    0.05f
 
 /************* PID Motor *************/
 /*rise 0.3 settling 1.06 ov 2.5%   rt .3183  tb 0.85*/
@@ -55,7 +56,7 @@
 /* sampling komunikasi UART */
 #define SERIAL_SAMP 7173
 /* sampling gerak motor base */
-#define MOTOR_SAMP 5173
+#define MOTOR_SAMP 1000 //5173 aslinya
 /* sampling tracking path */
 #define TRACKING_SAMP 5173
 /* sampling pid motor base */

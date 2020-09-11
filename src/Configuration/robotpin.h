@@ -15,13 +15,13 @@
 /************ Deklarasi Serial UART ************/
 
 /*komunikasi serial dengan PC */
-RawSerial pc(USBTX, USBRX, 115200);
+RawSerial pc(PIN_JOY_TX, PIN_JOY_RX, 115200);
 // Serial pc(USBTX, USBRX, 115200);
-joysticknucleo stick(PIN_JOY_TX, PIN_JOY_RX);
+// joysticknucleo stick(PIN_JOY_TX, PIN_JOY_RX);
 
 
 /************ Deklarasi objek I2C **************/
-
+ 
 
 /************ Deklarasi objek Pneumatic **************/
 DigitalOut armKiri(PIN_ARM_KIRI);
@@ -34,7 +34,7 @@ DigitalOut tembak(PIN_TEMBAK);
 /* Odometry            : melakukan perhitungan odometry
  * TIM2 & TIM3         : Register timer untuk encoder eksternal
  * CMPS_SDA & CMPS_SCL : PIN I2C untuk compass */
-// odometriKRAI Odometry(TIM2, TIM3, CMPS_SDA, CMPS_SCL); 
+odometriKRAI Odometry(TIMENCX, TIMENCY, CMPS_SDA, CMPS_SCL);
 
 
 /************ Deklarasi objek encoder ************/
@@ -69,7 +69,5 @@ Motor D_motor(PIN_PWM_D, PIN_FWD_D,PIN_REV_D);
 
 /* button builtin Nucleo */
 DigitalIn mybutton(USER_BUTTON);
-
-odometriKRAI Odometry(TIMENCX, TIMENCY, CMPS_SDA, CMPS_SCL);
 
 #endif
