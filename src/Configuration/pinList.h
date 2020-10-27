@@ -2,7 +2,7 @@
 
 #ifndef PINLIST_H
 #define PINLIST_H
- 
+  
 /************ Serial UART ************/
 
 /* Joystick transmit*/
@@ -49,9 +49,9 @@
 #define PIN_A_CHB       PC_12
 
 /* Encoder B */
-#define PIN_B_CHA       PC_3
+#define PIN_B_CHA       PC_13
 /* Encoder B */
-#define PIN_B_CHB       PC_2
+#define PIN_B_CHB       PC_10
 
 /* Encoder C */
 #define PIN_C_CHA       PC_14
@@ -59,9 +59,9 @@
 #define PIN_C_CHB       PC_15
 
 /* Encoder D */
-#define PIN_D_CHA       PC_13
+#define PIN_D_CHA       PC_2
 /* Encoder D */
-#define PIN_D_CHB       PC_10
+#define PIN_D_CHB       PC_3
 
 
 /************ pwm motor ************/
@@ -82,18 +82,18 @@
 #define PIN_REV_B       PC_0
 
 /* Motor C */
-#define PIN_PWM_C       PB_1
+#define PIN_PWM_C       PA_11
 /* Motor C */
-#define PIN_FWD_C       PB_14
+#define PIN_FWD_C       PB_12
 /* Motor C */
-#define PIN_REV_C       PB_15
+#define PIN_REV_C       PA_12
 
 /* Motor D */
-#define PIN_PWM_D       PB_10
+#define PIN_PWM_D       PB_1
 /* Motor D */
-#define PIN_FWD_D       PA_10
+#define PIN_FWD_D       PB_15
 /* Motor D */
-#define PIN_REV_D       PB_3
+#define PIN_REV_D       PB_14
 
 
 

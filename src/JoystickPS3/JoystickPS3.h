@@ -27,8 +27,14 @@ public:
     
     void setup(){
         _serial.baud(JoystickPS3__serialDEFAULT_BAUD);
+        _serial.attach(callback(this, &joysticknucleo::baca_data), _serial.RxIrq);
   //      debug.baud(9600);
-        }
+    }
+
+    void abort(){
+        _serial.abort_read();
+        _serial.abort_write();
+    }
  
     /*********************************************************************************************/
     /**                                                                                         **/
@@ -140,6 +146,25 @@ public:
         LY = 0;
     
     }
+
+    void reset(){
+        segitiga = false;
+        lingkaran = false;
+        silang = false;
+        kotak = false;;
+        atas = false;
+        kanan = false;
+        bawah = false;
+        kiri = false;
+        
+        // Pengolahan data dari data "RL" 
+        R1 = false;
+        R2 = false;
+        L1 = false;
+        L2 = false;
+        START = false;
+        SELECT = false;
+    }
     
     /*********************************************************************************************/
     /**                                                                                         **/
@@ -163,7 +188,7 @@ public:
     void baca_data()
     {
         // Interrupt Serial
-        if(_serial.readable()&&(_serial.getc()==0x88)) {
+        if((_serial.getc()==0x88)) {
             // Pembacaan data dilakukan jika data awal yang diterima adalah 0x88 kemudian 0x08
             if(_serial.getc()==0x08){
                 // Proses Pembacaan Data
@@ -208,7 +233,7 @@ public:
   
 protected:  
     virtual int _getc(){return _serial.getc();}
-    Serial _serial;
+    RawSerial _serial;
 };
  
 };

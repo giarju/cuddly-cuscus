@@ -13,11 +13,11 @@
 /*************************** Deklarasi PIN  **********************************/
 
 /************ Deklarasi Serial UART ************/
-
+ 
 /*komunikasi serial dengan PC */
-RawSerial pc(PIN_JOY_TX, PIN_JOY_RX, 115200);
+RawSerial pc(USBTX, USBRX, 115200);
 // Serial pc(USBTX, USBRX, 115200);
-// joysticknucleo stick(PIN_JOY_TX, PIN_JOY_RX);
+joysticknucleo stick(PIN_JOY_TX, PIN_JOY_RX);
 
 
 /************ Deklarasi objek I2C **************/
@@ -28,7 +28,7 @@ DigitalOut armKiri(PIN_ARM_KIRI);
 DigitalOut armKanan(PIN_ARM_KANAN);
 DigitalOut tembak(PIN_TEMBAK);
 
-
+ 
 /************ Deklarasi objek odometri ************/
 
 /* Odometry            : melakukan perhitungan odometry
