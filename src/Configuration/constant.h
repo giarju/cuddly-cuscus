@@ -67,7 +67,7 @@
 #define TRACKING_SAMP 5173
 /* sampling pid motor base */
 #define PID_MOTOR_SAMP 7173
-
+/* Sampling joystick */
 #define STICK_SAMP 20173
 
 

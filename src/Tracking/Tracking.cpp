@@ -44,7 +44,7 @@ float computeAlpha(Coordinate next_pos, Coordinate current_pos)
 }
 
 /* Mencari intersection circle and path terjauh dan point terdekat*/
-void findClosestIntersection(Trajectory_vr* map, Coordinate current_pos, int map_size, int prev_closest, float pursuit_radius, int* closest_point, int* target_point, int* is_intersect)
+void findClosestIntersection(Trajectory_vr* map, Coordinate current_pos, uint32_t map_size, uint32_t prev_closest, float pursuit_radius, int* closest_point, int* target_point, int* is_intersect)
 {
     //brute force find closest distance of points to robot 
     float distance_2_robot = 1000000; //initialize to very big size
