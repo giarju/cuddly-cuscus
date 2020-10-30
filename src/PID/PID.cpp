@@ -25,7 +25,7 @@ PID :: PID(float p , float i , float d , float _N , float _Ts, float kf1, float 
 
 float PID::createpwm( float setpoint , float feedback, float saturate)
 {
-    if (mode = PID_CONT_MODE){
+    if (mode == PID_CONT_MODE){
         e2 = setpoint-feedback - e0; //e_der
         e1 += setpoint-feedback; //e_sum
         e0 = setpoint-feedback;
@@ -59,7 +59,7 @@ float PID::createpwm( float setpoint , float feedback, float saturate)
 float PID::createpwmFF( float setpoint , float next_setpoint, float feedback, float saturate)
 {
 
-    if (mode = PID_CONT_MODE){
+    if (mode == PID_CONT_MODE){
         e2 = setpoint-feedback - e0; //e_der
         e1 += setpoint-feedback; //e_sum
         e0 = setpoint-feedback;

@@ -352,7 +352,7 @@ void motorSamp()
 
 
     /* menggerakan motor base */
-    A_motor.speed(1);
+    A_motor.speed(A_pwm);
     B_motor.speed(B_pwm);
     C_motor.speed(C_pwm); 
     D_motor.speed(D_pwm);
@@ -361,7 +361,6 @@ void motorSamp()
     // robot_sim1.motor2.motorSim(B_pwm);
     // robot_sim1.motor3.motorSim(C_pwm);
     // robot_sim1.motor4.motorSim(D_pwm);
-
 }
 #endif
 
