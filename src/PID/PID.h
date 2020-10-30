@@ -13,7 +13,8 @@ class PID{
     public :
             typedef enum Mode{
                 PI_MODE,
-                PID_MODE
+                PID_MODE,
+                PID_CONT_MODE
             }Mode;
  
             PID(float p , float i , float d , float _N , float _Ts, float kf1, float kf2, float kf3, float kf4, Mode _mode);

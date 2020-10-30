@@ -25,12 +25,22 @@ PID :: PID(float p , float i , float d , float _N , float _Ts, float kf1, float 
 
 float PID::createpwm( float setpoint , float feedback, float saturate)
 {
-    e2 = e1 ;
-    e1 = e0 ;
-    u2 = u1 ;
-    u1 = u0 ;
-    e0 = setpoint-feedback;
-    u0 = - (ku1 * u1 )  - ( ku2*u2 )  + ke0*e0 + ke1*e1 + ke2*e2;
+    if (mode = PID_CONT_MODE){
+        e2 = setpoint-feedback - e0; //e_der
+        e1 += setpoint-feedback; //e_sum
+        e0 = setpoint-feedback;
+
+        u0 = Kp*e0 + Ki*e1 + Kd*e2;
+    } 
+    else {
+        e2 = e1 ;
+        e1 = e0 ;
+        u2 = u1 ;
+        u1 = u0 ;
+        e0 = setpoint-feedback;
+
+        u0 = - (ku1 * u1 )  - ( ku2*u2 )  + ke0*e0 + ke1*e1 + ke2*e2;
+    }
 
     if (u0 >= saturate)
     {
@@ -48,12 +58,23 @@ float PID::createpwm( float setpoint , float feedback, float saturate)
 
 float PID::createpwmFF( float setpoint , float next_setpoint, float feedback, float saturate)
 {
-    e2 = e1 ;
-    e1 = e0 ;
-    u2 = u1 ;
-    u1 = u0 ;
-    e0 = setpoint-feedback;
-    u0 = - (ku1 * u1 )  - ( ku2*u2 )  + ke0*e0 + ke1*e1 + ke2*e2;
+
+    if (mode = PID_CONT_MODE){
+        e2 = setpoint-feedback - e0; //e_der
+        e1 += setpoint-feedback; //e_sum
+        e0 = setpoint-feedback;
+
+        u0 = Kp*e0 + Ki*e1 + Kd*e2;
+    } 
+    else {
+        e2 = e1 ;
+        e1 = e0 ;
+        u2 = u1 ;
+        u1 = u0 ;
+        e0 = setpoint-feedback;
+
+        u0 = - (ku1 * u1 )  - ( ku2*u2 )  + ke0*e0 + ke1*e1 + ke2*e2;
+    }
 
     if (u0 >= saturate)
     {
@@ -77,7 +98,7 @@ float PID::createpwmFF( float setpoint , float next_setpoint, float feedback, fl
     }
 
     prev_setpoint = setpoint;
-    prev_u0_ff = u0_feed_forward;
+    prev_u0_ff = u0_total;
 
     return u0_total ;   
 }

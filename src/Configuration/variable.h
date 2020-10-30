@@ -90,13 +90,13 @@ float alpha;
 /* Objek untuk melakukan PID motor */ 
 
 /* PID untuk motor A base (mode PID) */
-PID A_pid_motor(A_kp, A_ki, A_kd, A_N, A_TS, A_kf1, A_kf2, A_kf3, A_kf4, PID::PID_MODE);
+PID A_pid_motor(A_kp, A_ki, A_kd, A_N, A_TS, A_kf1, A_kf2, A_kf3, A_kf4, PID::PI_MODE);
 /* PID untuk motor B base (mode PID) */
-PID B_pid_motor(B_kp, B_ki, B_kd, B_N, B_TS, B_kf1, B_kf2, B_kf3, B_kf4, PID::PID_MODE);
+PID B_pid_motor(B_kp, B_ki, B_kd, B_N, B_TS, B_kf1, B_kf2, B_kf3, B_kf4, PID::PI_MODE);
 /* PID untuk motor C base (mode PID) */
-PID C_pid_motor(C_kp, C_ki, C_kd, C_N, C_TS, C_kf1, C_kf2, C_kf3, C_kf4, PID::PID_MODE);
+PID C_pid_motor(C_kp, C_ki, C_kd, C_N, C_TS, C_kf1, C_kf2, C_kf3, C_kf4, PID::PI_MODE);
 /* PID untuk motor D base (mode PID) */
-PID D_pid_motor(D_kp, D_ki, D_kd, D_N, D_TS, D_kf1, D_kf2, D_kf3, D_kf4, PID::PID_MODE);
+PID D_pid_motor(D_kp, D_ki, D_kd, D_N, D_TS, D_kf1, D_kf2, D_kf3, D_kf4, PID::PI_MODE);
 
 
 /********************** Komunikasi ******************************/

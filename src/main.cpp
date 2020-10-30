@@ -8,10 +8,10 @@
 /******************** Aktivasi Debug ************************/
 
 // #define ODOMETRY_DEBUG 
-#define SERIAL_DEBUG 
-// #define MOTOR_DEBUG
-// #define ENCMOTOR_DEBUG
-// #define PID_MOTOR_DEBUG 
+// #define SERIAL_DEBUG 
+#define MOTOR_DEBUG
+#define ENCMOTOR_DEBUG
+#define PID_MOTOR_DEBUG 
 // #define TRACKING_DEBUG
 #define JOYSTICK_DEBUG
 // #define PENGAMAN_PWM
@@ -205,7 +205,7 @@ int main ()
         #endif
 
         /* print data acquisition */
-        // if (data_i == 600){
+        // if (data_i == 600 && stick_kotak){
         //     for (int q = 0; q < 600; q++){
         //         pc.printf("%.2f %.2f %.2f %.2f %d\n", data1[q], data2[q], data3[q], data4[q], data_t[q]);
         //     }
@@ -276,7 +276,7 @@ void encoderMotorSamp()  /* butuh 8 us */
     d_motor_speed = (float)D_enc.getPulses()*2*PI*WHEEL_RAD/ENC_MOTOR_PULSE/ENC_MOTOR_SAMP*US_TO_S;
 
     /* akuisisi data motor */
-    // if (data_i < 600){ 
+    // if (data_i < 600 && stick_silang){ 
     //     data1[data_i] = a_motor_speed;
     //     data2[data_i] = b_motor_speed;
     //     data3[data_i] = c_motor_speed;
@@ -305,20 +305,27 @@ void encoderMotorSamp()  /* butuh 8 us */
 #ifdef PID_MOTOR_DEBUG
 void pidMotorSamp()
 {   
-    a_target_speed = -fwd[data_i];
-    b_target_speed = fwd[data_i];
-    c_target_speed = fwd[data_i];
-    d_target_speed = -fwd[data_i];
+    
     if (data_i < 677){
+        a_target_speed = -fwd[data_i]*0.66;
+        b_target_speed = fwd[data_i]*0.66;
+        c_target_speed = fwd[data_i]*0.66;
+        d_target_speed = -fwd[data_i]*0.66 ;
         data_i++;
+    }
+    else { 
+        // a_target_speed = 0;
+        // b_target_speed = 0;
+        // c_target_speed = 0;
+        // d_target_speed = 0;
     }
 
     /* menghitung pid motor base */
     float max_pwm = 24;
-    A_pwm = A_pid_motor.createpwm(a_target_speed, a_motor_speed, max_pwm)/24;
-    B_pwm = B_pid_motor.createpwm(b_target_speed, b_motor_speed, max_pwm)/24;
-    C_pwm = C_pid_motor.createpwm(c_target_speed, c_motor_speed, max_pwm)/24;
-    D_pwm = D_pid_motor.createpwm(d_target_speed, d_motor_speed, max_pwm)/24;   
+    A_pwm = A_pid_motor.createpwm(a_target_speed, a_motor_speed, max_pwm);
+    B_pwm = B_pid_motor.createpwm(b_target_speed, b_motor_speed, max_pwm);
+    C_pwm = C_pid_motor.createpwm(c_target_speed, c_motor_speed, max_pwm);
+    D_pwm = D_pid_motor.createpwm(d_target_speed, d_motor_speed, max_pwm);   
 }
 #endif
 
@@ -332,20 +339,20 @@ void motorSamp()
     float pwm_test;
 
     /* input akuisisi data */
-    // if (data_i < 300){
-    //     pwm_test = 1;
+    // if (data_i < 500 && stick_silang){
+    //     pwm_test = 0.6;
     // }
     // else{
     //     pwm_test = 0;
     // }
-    // A_motor.speed(pwm_test);
+    // A_motor.speed(-pwm_test);
     // B_motor.speed(pwm_test);
     // C_motor.speed(pwm_test); 
-    // D_motor.speed(pwm_test);
+    // D_motor.speed(-pwm_test);
 
 
     /* menggerakan motor base */
-    A_motor.speed(A_pwm);
+    A_motor.speed(1);
     B_motor.speed(B_pwm);
     C_motor.speed(C_pwm); 
     D_motor.speed(D_pwm);
@@ -366,8 +373,8 @@ void motorSamp()
 void pcSerialSamp() /*1200 us untuk 16 karakter pc.printf*/ /* 20 us dgn attach*/
 {
     /* write string ke buffer 1 (str_buffer) */     
-    sprintf(str_buffer, "%d %d\n", stick_atas, stick_silang);
-    // sprintf(str_buffer, "%.2f %.2f %.2f %.2f\n", a_motor_speed, b_motor_speed, c_motor_speed, d_motor_speed);
+    // sprintf(str_buffer, "%d %d\n", stick_atas, stick_silang);
+    sprintf(str_buffer, "%.2f %.2f %.2f %.2f\n", a_motor_speed, b_motor_speed, c_motor_speed, d_motor_speed);
     // sprintf(str_buffer, "%.2f\n",  a_target_speed);
     /* mengirimkan string melalui uart */
     sendUart(str_buffer);      
