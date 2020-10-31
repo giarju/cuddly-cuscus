@@ -19,6 +19,7 @@
 #define ENCMOTOR_DEBUG
 #define PID_MOTOR_DEBUG 
 // #define TRACKING_DEBUG
+#define FSM_DEBUG
 #define JOYSTICK_DEBUG
 // #define SIMUL_DEBUG
 
@@ -29,16 +30,12 @@
 #include "Configuration/variable.h"
 #include "Configuration/robotpin.h"
 #include "Configuration/map.h"
+
+#ifdef SIMUL_DEBUG
 #include "RobotModelKRAI/MotorModel.h"
 #include "RobotModelKRAI/EncModel.h"
 #include "RobotModelKRAI/RobotModel.h"
-
-
-
-float lastThetaRobot = 0;
-float totalThetaRobot = 0;
-float theta_destination = 0;
-
+#endif
 
 /**************** function declaration ***********************/
 /* 
@@ -78,6 +75,12 @@ void trackingSamp();
 void pcSerialSamp();
 
 /* 
+ * prosedur sampling state machine
+ * 
+ * */
+void stateSamp();
+
+/* 
  * prosedur untuk mengirimkan data melalui uart dengan double buffer
  * 
  * */
@@ -96,39 +99,27 @@ void writeUart();
 void stickState();
 
 /* 
- * prosedur untuk test kecepatan trapesium motor
+ * state untuk ganti map di simulasi
  * 
  * */
 void mapState();
-float trapeziumProfile(float amax, float vmax, float smax, float TS,float prev_speed, uint32_t initial_time, uint32_t time);
-float trapeziumTarget(float amax, float vmax, float prev_speed, float TS);
+
+/* 
+ * prosedur untuk menyimpan variable joystick
+ * */
 void simpanStick();
+
+/* 
+ * prosedur sampling joystick
+ * */
 void joystickSamp();
 
+/* 
+ * prosedur sampling simulasi
+ * */
 void simul_samp();
-int simulcnt = 0;
-float simulspeed,simv2;
-float simv;
-float simv3;
-int curr_clst_point; int tp;
 
-double k1 = 1, k2 = -1.99861880768107, k3 = 0.998618807681070, k4 = 4.55434472841233e-07, k5 = 4.55243089052985e-07, k6 = 9.28554056001574e-17;
-MotorModel motor_sim1(k1, k2, k3, k4, k5, k6, 24);
-int t_pulse = 538; float wrad = 0.1;
-EncModel enc_sim1(t_pulse, wrad);
-RobotModel robot_sim1(RobotModel::OMNI_4);
-Trajectory_vr next_point;
-int target_point;
-int is_intersect;
-float alphass;
-float cos_alpha;
-float vr_sim;
-int map_state = 0;
-int map_check;
-uint32_t button_debounce;
-float data1[600], data2[600], data3[600], data4[600];
-int data_i = 0;
-uint32_t data_t[600];
+
 /******************* Main Function **************************/
 int main ()
 {
@@ -176,6 +167,10 @@ int main ()
         /* sampling komunikasi serial */
         stick_ticker.attach_us(&pcSerialSamp, SERIAL_SAMP);
     #endif 
+
+    #ifdef FSM_DEBUG
+        fsm_ticker.attach_us(&stateSamp, FSM_SAMP);
+    #endif
 
     #ifdef SIMUL_DEBUG
         /* sampling komunikasi serial */
@@ -230,7 +225,6 @@ void trackingSamp()
     /* menghitung kecepatan robot berdasarkan map dan posisi aktual*/
     #ifdef AUTOMATIC
     mapState();
-    map_check = map_size[map_state];
     findClosestIntersection(map_pointer[map_state], robot_sim1.Odometry_position, map_size[map_state], curr_clst_point, PURSUIT_RADIUS_BASE,  &curr_clst_point, &tp, &is_intersect);
     next_point =  getLinearIntpPoint(map_pointer[map_state], robot_sim1.Odometry_position,is_intersect, tp, PURSUIT_RADIUS_BASE);
     alphass = computeAlpha(next_point.distance,robot_sim1.Odometry_position);
@@ -243,6 +237,18 @@ void trackingSamp()
     #ifdef MANUAL
     base_speed.teta = thetaFeedback(base_speed.teta,Odometry.position.teta,&lastThetaRobot, &totalThetaRobot, TRACKING_SAMP/1000);
     baseTrapezoidProfile(&base_speed, &base_prev_speed,2, 2, 1, TRACKING_SAMP/1000);
+    #endif
+
+    #ifdef SIMUL_DEBUG
+    mapState();
+    map_check = map_size[map_state];
+    findClosestIntersection(map_pointer[map_state], robot_sim1.Odometry_position, map_size[map_state], curr_clst_point, PURSUIT_RADIUS_BASE,  &curr_clst_point, &tp, &is_intersect);
+    next_point =  getLinearIntpPoint(map_pointer[map_state], robot_sim1.Odometry_position,is_intersect, tp, PURSUIT_RADIUS_BASE);
+    alphass = computeAlpha(next_point.distance,robot_sim1.Odometry_position);
+    
+    base_speed.x= next_point.vr*cos(alphass);
+    base_speed.y = next_point.vr*sin(alphass);
+    base_speed.teta = next_point.distance.teta;
     #endif
 
     /* menghitung kecepatan masing2 motor base dengan inverse kinematic*/
@@ -424,17 +430,50 @@ void writeUart() /* butuh 4 us */
     
 #ifdef JOYSTICK_DEBUG
 void simpanStick(){
-    stick_kanan = stick.kanan; stick_kiri = stick.kiri; stick_atas = stick.atas; stick_bawah = stick.bawah;
-    stick_segitiga = stick.segitiga; stick_lingkaran = stick.lingkaran; stick_silang = stick.silang; stick_kotak = stick.kotak;
-    stick_R1 = stick.R1; stick_R2 = stick.R2; stick_L1 = stick.L1; stick_L2 = stick.L2;
-    stick_select = stick.SELECT; stick_start = stick.START; 
+    joy.stick_kanan = stick.kanan; 
+    joy.stick_kiri = stick.kiri; 
+    joy.stick_atas = stick.atas; 
+    joy.stick_bawah = stick.bawah;
+
+    joy.stick_segitiga = stick.segitiga; 
+    joy.stick_lingkaran = stick.lingkaran; 
+    joy.stick_silang = stick.silang; 
+    joy.stick_kotak = stick.kotak;
+
+    joy.stick_R1 = stick.R1; 
+    joy.stick_R2 = stick.R2; 
+    joy.stick_L1 = stick.L1; 
+    joy.stick_L2 = stick.L2;
+
+    joy.stick_select = stick.SELECT; 
+    joy.stick_start = stick.START; 
+
+    joy.stick_kanan_click = stick.kanan_click; 
+    joy.stick_kiri_click = stick.kiri_click; 
+    joy.stick_atas_click = stick.atas_click; 
+    joy.stick_bawah_click = stick.bawah_click;
+
+    joy.stick_segitiga_click = stick.segitiga_click; 
+    joy.stick_lingkaran_click = stick.lingkaran_click; 
+    joy.stick_silang_click = stick.silang_click; 
+    joy.stick_kotak_click = stick.kotak_click;
+
+    joy.stick_R1_click = stick.R1_click; 
+    joy.stick_R2_click = stick.R2_click; 
+    joy.stick_L1_click = stick.L1_click; 
+    joy.stick_L2_click = stick.L2_click;
+    
+    joy.stick_select_click = stick.SELECT_click; 
+    joy.stick_start_click= stick.START_click; 
 }
 void joystickSamp(){
     stick.olah_data();
     simpanStick();
+    Statoo.putChangeStick(joy);
     stick.reset();
     stick.idle();
 }
+
 /* state joystick */
 // void stickState(){
 // //Procedure to read command from stick and take action
@@ -541,7 +580,14 @@ void joystickSamp(){
 // }
 #endif
 
+#ifdef FSM_DEBUG
+void stateSamp()
+{
+    Statoo.fsmAuto(near_last, posisi_tangan);
+}
+#endif 
 
+/* state untuk simulasi */
 void mapState()
 {
     /* next map */

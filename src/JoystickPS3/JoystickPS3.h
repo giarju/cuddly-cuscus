@@ -156,8 +156,23 @@ public:
         kanan = false;
         bawah = false;
         kiri = false;
+
+        segitiga_click = false;
+        lingkaran_click = false;
+        silang_click = false;
+        kotak_click = false;;
+        atas_click = false;
+        kanan_click = false;
+        bawah_click = false;
+        kiri_click = false;
+
+        R1_click = false;
+        R2_click = false;
+        L1_click = false;
+        L2_click = false;
+        START_click = false;
+        SELECT_click = false;
         
-        // Pengolahan data dari data "RL" 
         R1 = false;
         R2 = false;
         L1 = false;

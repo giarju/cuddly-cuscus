@@ -3,6 +3,21 @@
 
 #include "Path/Path.h"
 
+#ifndef SIMUL_DEBUG
+Trajectory_vr mapinit[1]={
+   {0.0000000e+00,   0.0000000e+00,   0.0000000e+00,   0.0000000e+00}
+};
+
+Trajectory_vr* map_pointer[1]={
+   mapinit
+};
+
+int map_size[1] = {
+   1
+};
+#endif
+
+#ifdef SIMUL_DEBUG
 Trajectory_vr mapvr[1046]={
    {0.0000000e+00,   0.0000000e+00,   0.0000000e+00,   0.0000000e+00},
    {5.3707929e-02,  -3.4609073e-02,   0.0000000e+00,   5.0046078e-01},
@@ -1073,5 +1088,6 @@ Trajectory_vr* map_pointer[3]={
 int map_size[] = {
    1,1046,7
 };
+#endif
 
 #endif

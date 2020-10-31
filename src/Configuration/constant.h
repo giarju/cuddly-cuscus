@@ -69,6 +69,22 @@
 #define PID_MOTOR_SAMP 7173
 /* Sampling joystick */
 #define STICK_SAMP 20173
+/* Sampling fsm */
+#define FSM_SAMP 10173
+
+typedef struct stick_message_t{
+        bool stick_kanan; bool stick_kiri; bool stick_atas; bool stick_bawah;
+        bool stick_segitiga; bool stick_lingkaran; bool stick_silang; bool stick_kotak;
+
+        bool stick_kanan_click; bool stick_kiri_click; bool stick_atas_click; bool stick_bawah_click;
+        bool stick_segitiga_click; bool stick_lingkaran_click; bool stick_silang_click; bool stick_kotak_click;
+
+        bool stick_R1; bool stick_R2; bool stick_L1; bool stick_L2;
+        bool stick_select; bool stick_start; 
+
+        bool stick_R1_click; bool stick_R2_click; bool stick_L1_click; bool stick_L2_click;
+        bool stick_select_click; bool stick_start_click;    
+} stick_message;
 
 
 #endif
